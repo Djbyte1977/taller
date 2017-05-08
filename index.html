@@ -1,1 +1,2254 @@
-<h1>hola mundo</h1>
+﻿<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Taller de Docker</title>
+		<meta name="description" content="Introducción a los contenedores Docker">
+		<meta name="author" content="José Luis Zamora Sánchez">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/starwars.css">
+		<link rel="stylesheet" href="css/theme/experto.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/github.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+
+	</head>
+	<body>
+		<div class="reveal">
+
+			<div class="slides">
+				<section class="intro" data-background="imagenes/Logo.jpg" data-transition="zoom">
+				</section>
+				<section>
+					<br>
+					<p align="left">Acerca de quien os habla</p>
+					<p  align=center><img style="border: 0;" height="400" src="imagenes/twitter.png"></p>
+					<div style="font-size: 15px;">
+						<div> <img style="border: 0; vertical-align:middle" height="30" src="imagenes/mail.png"> <span style="">Joseluis.zamora@ua.es</span> <img style="border: 0; vertical-align:middle" height="30" src="imagenes/Twitter-2-128.png"> <span style="">jlzamoras</span></div>
+					</div>
+				</section>
+				<section class="intro">
+					<h2>¿Qué aprenderemos en este curso?</h2>
+					<br>
+					<ul align=left>
+						<li class="fragment">Qué son los contenedores y qué beneficios aportan.</li>
+						<li class="fragment">Arquitectura y ecosistema de Docker.</li>
+						<li class="fragment">Comandos básicos de despliegue.</li>
+						<li class="fragment">Trabajar con volúmenes.</li>
+						<li class="fragment">Crear nuestros propios contenedores.</li>
+						<li class="fragment">Composición de contenedores.</li>
+						<li class="fragment">Escalado de servicios.</li>
+					</ul>
+				</section>
+
+				<section data-transition="slide">
+					<h2>¿Qué necesitamos?</h2>
+					<br>
+					<p align=left>Do it yourself!</p>
+					<ul align=left>
+						<li>Máquina virtual linux con Docker 1.13+. <a href="mv/CursoDocker.zip" target="_blank">Aquí.</a></li>
+						<li>Exponer puertos 22(222 host),8080</li>
+						<li>Cliente SSH, como Putty. <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank">Aquí.</a></li>
+					</ul>
+					<p align=left><br>Lazy mode :P</p>
+					<ul align=left>
+						<li>Play with Docker <a href="http://play-with-docker.com/" target="_blank">http://play-with-docker.com/</a></li>
+						<li>PWD Driver <a href="https://github.com/franela/docker-machine-driver-pwd" target="_blank">https://github.com/franela/docker-machine-driver-pwd</a></li>
+					</ul>
+					<p align=left><br>Guarda tus proyectos!</p>
+					<ul align=left>
+						<li>Cuenta en GitHub / Bitbucket.</li>
+					</ul>
+				</section>
+
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>OBJETIVO DEL CURSO</h2>
+				</section>
+
+				<section data-transition="fade-in">
+						<img src="imagenes/kungfu.jpg"/>
+						<p  align=center>O casi...</p>
+				</section>
+
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>UN POCO DE CONTEXTO...</h2>
+				</section>
+				<section class="star-wars" data-background="imagenes/starwars.jpg">
+				<div class="fade"></div>
+			  <div class="crawl">
+				<div class="title">
+					<br><br><br><br>
+					<br><br><br><br>
+					<br><br><br><br>
+				  <p>Episode II</p>
+				  <br>
+				  <p>Attack of the Dockers </p>
+				  <br>
+				</div>
+
+				<p>En el departamento de TI reina la inquietud. Desarrollo quiere desplegar varios miles de microservicios y el equipo de Sistemas no da abasto.</p>
+
+				<p>Este avalancha de despliegues, liderada por un analista evangelizador de Agile, ha provocado
+				que al limitado número de administradores le resulte dificil gestionar los despliegues
+				y mantener el orden en los sistemas.</p>
+
+				<p>Tras un periodo de formación, regresa uno de los arquitectos software más brillantes con una
+				posible herramienta que podría equilibrar las fuerzas, y ayudar a los desbordados administradores...</p>
+
+			  </div>
+			</section>
+
+				<section data-transition="fade-in">
+                    <h2>Cloud Computing</h2>
+					<p align=left>Ofrece distintos tipos de componentes/servicios de forma estandarizada y ocultando su complejidad:</p>
+					<br>
+                    <ul align=left>
+						<li>Software as a Service: Google Services, Microsoft...</li>
+						<li>Platform as a Service: Cloud Foundry, OpenShift, Heroku... </li>
+						<li>IaaS: Amazon, Azure, Open Stack...</li>
+					</ul>
+                </section>
+				<section data-transition="slide">
+                    <h2>Agile</h2>
+					<p align=left>Metodología de desarrollo que surge en contraposición al desarrollo en cascada.</p>
+					<br>
+                    <ul align=left>
+						<li >Iteraciones en las que van acometiendo tareas según prioridad.</li>
+						<li>Promueve equipos generalmente pequeños, autoorganizados con responsabilidad compartida.</li>
+						<li>Se apoya en herramientas automáticas de compilación, prueba y despliegue.</li>
+					</ul>
+						<p  align=center><img style="border: 0;" height="170" src="imagenes/agile.jpg"></p>
+                </section>
+				<section data-transition="slide">
+					<br>
+                    <h2>DevOps</h2>
+					<p align=left>Promueve la colaboración activa entre equipos de desarrollo y operaciones en pro del producto final.</p>
+					<br>
+                    <ul align=left>
+						<li>Romper con los "silos".</li>
+						<li>Adaptación de las tareas tradicionales de operaciones a metodologías ágiles.</li>
+						<li>Automatización de procesos, DRY. Operaciones como acelerador y no como "stopper".</li>
+					</ul>
+					<p  align=center><img style="border: 0;" height="170" src="imagenes/devopsevil.jpg"></p>
+                </section>
+
+				<section data-transition="slide">
+                    <h2>Microservicios</h2>
+					<p align=left>Metodología aplicable a proyectos que buscan principalmente escalabilidad.</p>
+					<br>
+					<ul align=left>
+						<li>DDD y DRY. Descomposición funcional de las aplicaciones.</li>
+						<li>Promueven equipos reducidos y especializados en funcionalidades concretas.</li>
+						<li>Se integra y beneficia enormemente de todos los conceptos anteriores.</li>
+					</ul>
+					<p  align=center><img style="border: 0;" height="200" src="imagenes/microservices.png"></p>
+
+                </section>
+
+				<section data-transition="slide">
+					<br>
+                    <h2>What do you speak?</h2>
+                        <p class="fragment roll-in">
+                            <img src="imagenes/java.png"/>
+                            <img src="imagenes/javascript.png"/>
+                            <img src="imagenes/ruby.jpeg"/>
+                            <img src="imagenes/python.jpg"/>
+                            <img src="imagenes/groovy.png"/>
+                            <img src="imagenes/clojure.png"/>
+                            <img src="imagenes/scala.jpeg"/>
+                            <img src="imagenes/ceylon_logo.png"/>
+                        </p>
+                </section>
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>Y ENTONCES LLEGÓ DOCKER...</h2>
+					<img src="imagenes/happy.gif"/>
+				</section>
+				<section data-transition="fade-in">
+					<ul align=left>
+						<li class="fragment"><em>Eficiente:</em> Inicia servicios en segundos, no en minutos. Aprovechamiento de recursos muy superior a las M.V.</li><br>
+						<li class="fragment"><em>Portable:</em> permite desplegar servicios sobre distintas infraestructuras independientemente de su configuración</li><br>
+						<li class="fragment"><em>Estándar:</em> cualquier servicio se opera de la misma forma independientemente de su diseño interno o tecnología.</li><br>
+						<li class="fragment"><em>Escalable:</em> Implementa mecanismos para aumentar o disminuir las instancias de un servicio dentro de una máquina, CPD o nube.</li><br>
+						<li class="fragment"><em>Extensible:</em> Definición de nuevos servicios a partir de otros existentes o mediante composición de varios servicios.</li>
+					</ul>
+                </section>
+				<section data-transition="slide">
+					<h2>Docker vs máquina virtual</h2>
+					<p>
+						<img style="border: 0;"  height="350" src="imagenes/WhatIsDocker_2_VMs_0-2_2.png"/>
+						<img style="border: 0;"  height="350" src="imagenes/WhatIsDocker_3_Containers_2_0.png"/>
+                    </p>
+				</section>
+				<section data-transition="slide">
+					<p>
+						<img style="border: 0;"  height="550" src="imagenes/density.png"/>
+                    </p>
+				</section>
+				<section data-transition="slide">
+					<h2>Soy desarrollador, Docker me ayuda a:</h2>
+					<img style="border: 0;" height="180" src="imagenes/ryu.png"/>
+					<br>
+					<ul class="fragment" align=left>
+						<li>Levantar rápidamente mi entorno de desarrollo desplegando todos los servicios que necesito.</li>
+						<li>Simplificar la operación de estos servicios.</li>
+						<li>Acabar con el tópico de "en mi casa me compila". Si funciona en un equipo, debe funcionar en cualquiera.</li>
+						<li>Planificar tareas de integración continua en el que el software se compile, pruebe y despliegue como una caja negra.</li>
+					</ul>
+                </section>
+
+				<section data-transition="slide">
+					<h2>Soy técnico de Sistemas, Docker me ayuda a:</h2>
+					<img style="border: 0;" height="180" src="imagenes/ken.jpg"/>
+					<br>
+					<ul class="fragment" align=left>
+						<li>Reducir el mantenimiento de la infraestructura donde se desplieguen los servicios.</li>
+						<li>Simplificar la operación de estos servicios.</li>
+						<li>Simplificar el proceso de puesta en producción.</li>
+						<li>Aprovechamiento óptimo de la infraestructura, en contraposición a las máquinas virtuales.</li>
+					</ul>
+                </section>
+
+				<section data-transition="slide">
+					<h2>Para ambos, Docker es palanca de cambio de:</h2>
+					<br>
+					<ul align=left>
+						<li>Cloud Computing.</li>
+						<li>Metodologías ágiles.</li>
+						<li>DevOps.</li>
+						<li>Microservicios.</li>
+					</ul>
+					<h2><img style="border: 0;" height="250" src="imagenes/ryu_e_ken___amigos_by_sergio_borges.jpg"/></h2>
+
+                </section>
+
+				<section data-transition="slide">
+				    <p align=left>Y sin embargo no es una "nueva" tecnología...</p>
+					<p align=center><img style="border: 0;" height="400" src="imagenes/Docker-linux-interfaces.png"></p>
+					<a href="https://medium.com/@nagarwal/understanding-the-docker-internals-7ccb052ce9fe#.9blmubkzi" target="_blank">Más info sobre cgroups, namespaces...</a>.
+					<p align=left></p>
+				</section>
+
+
+				<section data-transition="slide">
+				<br>
+				    <p align=left>Demo time:</p>
+					<br>
+					<pre><code  class="bash"  data-trim  style="font-size: 18px;">
+					$ docker run -it --rm supertest2014/nyan
+					</code></pre>
+					 <img class="fragment" style="border: 0;" height="400"  src="imagenes/cat.png"/>
+				</section>
+
+				<section data-transition="slide">
+                    <p align=left>Algo de historia:</p>
+					<br>
+
+					<p align=left>Nace como un proyecto interno de la emplesa <i>dotCloud</i> dedicada a PaaS.</p>
+					<p align=left>Integra bajo un un único API las distintas herramientas que permiten trabajar con contenedores y conseguir un aprovechamiento optimo de la infraestructura.</p>
+					<br>
+					<ul align=left>
+						<li class="fragment">Marzo 2013: Open Source.</li>
+						<li class="fragment">Marzo 2014: Abandono de LXC como tecnología de contenedores en pro de una propia.</li			>
+						<li class="fragment">Febrero 2015: Orquestación de contenedores mediante nuevas herramientas: <i>compose, machine y swarm</i>.</li>
+						<li class="fragment">Abril 2016: Docker 1.11. Cambio de arquitectura. Runtime <i>containerd/runC</i>.</li>
+						<li class="fragment">Diciembre 2016: Docker Inc. dona </i>containerd</i> a la OCI.</li>
+					</ul>
+                </section>
+
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>AÑO 2017</h2>
+				</section>
+
+				<section data-transition="fade-in">
+					<h2>¡Contenedores everywhere!</h2>
+					<br>
+					<p  align=center><img style="border: 0;" height="400" src="imagenes/TomokoANIM.gif"></p>
+				</section>
+
+
+				</section>
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>CONCEPTOS BÁSICOS</h2>
+				</section>
+
+				<section>
+					<br>
+					<h2>Imagen</h2>
+
+					    <p align=left> Sistema de archivos basado en capas junto con metadatos sobre cómo ejecutar un proceso/servicio.</p>
+					<p  align=center><img style="border: 0;" height="400" src="imagenes/docker-image.png"></p>
+				</section>
+
+				<section>
+					<br>
+					<h2>Copy on Write</h2>
+
+					    <p align=left>Patrón de diseño aplicado a la gestión de recursos.</p>
+						<ul align=left>
+							<li>Busca eliminar duplicidades a nivel de recursos.</li>
+							<br>
+							<li >Si solicita tener varias copias de un recurso, físicamente se mantiene una sola.</li>
+							<li >Si se modifica un recurso, entonces se crea una copia nueva y pasa a ser la activa.</li>
+							<li >Aplicable a gestión de memoria, almacenamiento como backups incrementales...</li>
+						</ul>
+				</section>
+				<section>
+					<br>
+					<h2>Copy on Write</h2>
+						<ul align=left>
+							<li>AUFS es el driver por defecto en Docker.</li>
+							<li >Drivers alternativos: OverlayFS, Device Mapper, BTRFS, ZFS.</li>
+						</ul>
+						<br>
+						<p  align=center><img style="border: 0;" height="300" src="imagenes/storage.jpg"></p>
+				</section>
+
+				<section>
+					<br>
+					<h2>Contenedor</h2>
+					    <p align=left> Proceso creado a partir de una imagen de Docker.</p>
+						<br>
+						<ul align="left">
+							<li>Aislado del resto de procesos de la máquina.</li>
+							<li>Expone servicios a traves de una interfaz de red y una serie de puertos configurados.</li>
+							<li>Persiste cambios en una capa montada sobre el sistema de archivos heredado de la imagen.</li>
+						</ul>
+						<p  align=center><img style="border: 0;" height="250" src="imagenes/docker-layers.png"></p>
+				</section>
+
+				<section>
+                    <ul align="left">
+                        <li>Host: Máquina que ejecuta los contenedores.</li>
+						<li class="fragment">Demonio: Proceso de sistema que permite lanzar los contenedores.</li>
+						<li class="fragment">Dockerfile: Script que permite crear imágenes.</li>
+						<li class="fragment">Volumen: Almacenamiento persistente fuera de un contenedor.</li>
+						<li class="fragment">Registro: Repositorio de imágenes.</li>
+                    </ul>
+				</section>
+
+				<section data-transition="slide">
+				<br>
+				    <p align=left>Obtener la versión del demonio y el cliente de Docker:</p>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker version</code></pre>
+					<br>
+				    <p align=left>Obtener información extendida sobre la plataforma:</p>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker info</code></pre>
+					<br>
+
+					<p align=left>¿Qué tareas realiza este comando?</p>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run alpine /bin/echo '!Hola desde Docker!'
+
+experto@experto-VirtualBox:~$ docker run alpine /bin/echo '!Hola desde Docker!'
+Unable to find image 'alpine:latest' locally
+latest: Pulling from library/alpine
+c0cb142e4345: Pull complete
+Digest: sha256:ca7b185775966003d38ccbd9bba822fb570766e4bb69292ac23490f36f8a742e
+Status: Downloaded newer image for alpine:latest
+!Hola desde Docker!
+</code></pre>
+				</section>
+
+				<section data-transition="slide">
+				<br>
+					<h2>Sabores de Docker</h2>
+				    <ul align="left">
+						<li>Linux / Windows Server 2016.</li>
+						<p  align=center><img style="border: 0;" height="400" src="imagenes/docker_windows_linux.png"></p>
+                    </ul>
+				</section>
+
+				<section data-transition="slide">
+				<br>
+					<h2>Sabores de Docker</h2>
+				    <ul align="left">
+						<li>Docker Toolbox.</li>
+						<li>Docker for Windows/Mac.</li>
+						<p  align=center><img style="border: 0;" height="400" src="imagenes/docker linux_windows.png"></p>
+                    </ul>
+				</section>
+
+				<section data-transition="slide">
+				<br>
+					<h2>Sabores de Docker</h2>
+					<p align="left">AWS/Azure (bundled)</p>
+					<br>
+				    <ul align="left">
+						<li>Servicio de contenedores de Azure.</li>
+						<li>Amazon EC2 Container Service</li>
+						<li>Kubernetes/DC/OS,Swarm, Docker Datacenter</li>
+						<li>MV's</li>
+                    </ul>
+					<p>
+						<img style="border: 0;" src="imagenes/01-create.png"/>
+						<img style="border: 0;" src="imagenes/03-scale.png"/>
+						<img style="border: 0;" src="imagenes/04-tooling.png"/>
+                    </p>
+				</section>
+				<section data-transition="slide">
+					<h2>Cambios en el versionado de Docker</h2>
+					<p align=left><img style="border: 0;" height="400" src="imagenes/lifecycle.png"/></p>
+				</section>
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>COMANDOS BÁSICOS</h2>
+				</section>
+
+				<section data-transition="fade-in">
+				<br>
+				<p align=left>Parecidos pero no iguales</p>
+				<br>
+				<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+docker create			# -----> Crea un nuevo contenedor pero no lo ejecuta
+
+docker start			# -----> Ejecuta un contenedor ya creado
+
+docker run			# -----> Crea y ejecuta un nuevo contenedor
+
+docker pull			# -----> Descarga una imagen de Docker Hub o un repositorio
+
+				</code></pre>
+				</section>
+
+
+				<section data-transition="fade-in">
+				<br>
+					<h2>Trabajando con contenedores</h2>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker ps -a
+
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS               NAMES
+f95c0664ef0b        alpine              "/bin/echo '!Hola des"   2 minutes ago       Exited (0) 2 minutes ago      condescending_roentgen
+b395255258aa        264e8a788806        "/bin/sh"                5 weeks ago         Exited (0) 5 weeks ago                         pruebas
+
+$ docker rm condescending_roentgen
+
+$ docker run --name HolaMundo alpine /bin/echo '!Hola desde Docker!'
+
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS                     PORTS               NAMES
+0509525d493c        alpine              "/bin/echo '!Hola des"   6 seconds ago       Exited (0) 5 seconds ago                       HolaMundo
+
+$ docker rm HolaMundo
+
+# Borrar todos los contenedores
+
+docker rm $(docker ps -a -q)
+</code></pre>
+<br>
+<p align=left>Los contenedores se referencian por id o por nombre (elegido o automático).</p>
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Modo interactivo</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run -it --name HolaMundo alpine /bin/sh
+
+#(-it/-d). Ejecutar en otro shell:
+
+$ docker ps
+
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+0307aa10849f        alpine              "/bin/sh"           51 seconds ago      Up 50 seconds                           HolaMundo
+
+# Si el contenedor ya estuviera creado
+
+$ docker start -i HolaMundo
+#(-i/-d)
+
+</code></pre>
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Persistencia en los contenedores</h2>
+<p align=left>a)</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+#Dentro del contenedor "HolaMundo"
+
+$ cd
+$ mkdir pepe
+
+# y hacemos exit
+
+$ docker start -i HolaMundo
+</code></pre>
+<br>
+<p align=left>b)</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+
+$ docker rm HolaMundo
+$ docker run -it --name HolaMundo alpine /bin/sh
+$ cd
+$ ls
+</code></pre>
+<br>
+<p>No utilizar en BBDD de producción!</p>
+</section>
+<section data-transition="slide">
+<br>
+<h2>Modo interactivo vs background</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run -it --name tomcat -p8080:8080 tomcat:9-alpine
+
+# Ejecución de una imagen específica en modo interactivo
+
+# http://localhost:8080/
+
+# Pulsar CTRL+C para detener el proceso
+
+# Ejecución en background
+$ docker start tomcat
+tomcat
+
+$ docker ps
+</code></pre>
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Consultar metadatos de un contenedor</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+### --format "{{json .Plugins}}"
+$ docker inspect tomcat
+</code></pre>
+<br>
+<h2>Logs y Attach</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Devolvería el log que ha generado el contenedor
+$ docker logs -f tomcat
+
+# Conectarse en modo intectivo a un proceso en background
+$ docker attach tomcat
+</code></pre>
+<br>
+<h2>Ejecutar un comando dentro de un contenedor</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker exec -it tomcat sh
+</code></pre>
+
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Parada de contenedores</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Parada ordenada (graceful) de un contenedor
+
+docker stop tomcat
+
+# Parada inmediata
+
+docker kill tomcat
+</code></pre>
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Mapeo de puertos</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Mapeo específico:
+$ docker run -it --name tomcat -p8080:8080 tomcat:9-alpine
+
+# Mapeo aleatorio (scaling)
+$ docker run -it --name tomcat -P tomcat:9-alpine
+
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                     NAMES
+1ab976e19d81        tomcat:9-alpine     "catalina.sh run"   9 seconds ago       Up 9 seconds        0.0.0.0:32768->8080/tcp   tomcat
+</code></pre>
+<br>
+<p>Utilizar las propias interfaces de red del host</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run -it --net=host --name tomcat:9-alpine
+</code></pre>
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Variables de entorno</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+
+$ docker run -it --name tomcat -p8080:8080 --env JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom tomcat:9-alpine
+</code></pre>
+<br>
+<p align=left>¿Lentitud en el arranque de Tomcat?
+</section>
+
+
+<section data-transition="slide">
+<br>
+<h2>Cambiar el namespace de un contenedor. (debugging)</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Usar el namespace PID del host o de otro contenedor
+$ docker run -it --pid=host --rm alpine sh
+</code></pre>
+<h2>Failover</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run -d --restart=always --name tomcat \
+  -p8080:8080 --env JAVA_OPTS=-Djava.security.egd=file:/dev/./urandom tomcat:9-alpine;
+
+# Forzamos una parada del proceso interno dentro del contenedor
+$ docker exec -it tomcat sh
+./bin/shutdown.sh
+
+# Reiniciar ante un fallo limitando reinicios
+$ docker run --restart=on-failure:10 tomcat
+</code></pre>
+
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Trabajando con imágenes</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Listar imágenes en caché
+$ docker images
+
+# Borrar imágenes
+
+docker rmi tomcat:9-alpine
+Error response from daemon: conflict: unable to remove repository reference
+	"tomcat:9-alpine" (must force) - container 1ab976e19d81 is using its referenced image ece52517e252
+
+$ docker rm 1ab976e19d81
+
+$ docker rmi tomcat:9-alpine
+Untagged: tomcat:9-alpine
+Untagged: tomcat@sha256:ab617e924c7a1f9e6acd3b1a311bb9936dadfcc19aa732cf42c5702ee3188f91
+Deleted: sha256:ece52517e2520f148fac69f621bca8c40f9878bc9f3c8391cf170777fdc7ec7e
+Deleted: sha256:cca62d415f0a53f0f33eba12e9c7b6ec05b0c56e03761e75d834d1bd448d449f
+Deleted: sha256:3a86f028cb92d436e549c7df00663f8d6ff8498793c64f3662faa851fee1f86e
+Deleted: sha256:b926ead70029bec0156965eb9e85df2097afd67f5feb4196904c70dcb366a72b
+Deleted: sha256:49c2a504ef98b9f30cc67dfab8628832e49fbd6540f36db2dda663868013e231
+Deleted: sha256:49e7eff1f2f82a932f13af70011b9860d68cc74242e7e0dc90c98f4ca14554fc
+Deleted: sha256:5e60af7fc0f3925902f67f265bf83c82d6a58724904612e2a77cc2c1624b03b4
+Deleted: sha256:f4b953670d9d801b819daa53a95ed73e105ed0bd5a197b64c04b3db624184e80
+
+# Borrar todas las imágenes
+docker rmi $(docker images -q)
+</code></pre>
+</section>
+
+				<section data-transition="fade-in">
+					<br>
+					<h2>Resumiendo</h2>
+					<img style="border: 0;" height="500" src="imagenes/event_state.png"/>
+				</section>
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>VOLÚMENES</h2>
+				</section>
+				<section data-transition="fade-in">
+					<ul align=left>
+						<li>Contenedores --> Microservicios --> Stateless</li>
+						<li>Pets vs Cattle</li>
+						<li>Volúmenes: Almacenamiento permanente para contenedores</li>
+					</ul>
+					<br>
+					<p>
+                            <img style="border: 0;" height="250" src="imagenes/pet.jpg"/>
+                            <img style="border: 0;" height="250" src="imagenes/cattle.png"/>
+					</p>
+				</section>
+				<section data-transition="slide">
+					<p>Tenemos varias opciones:</p>
+					<br>
+					<ul align=left>
+						<li>Montar una ruta de la máquina Host.</li>
+						<li>Utilizar los volúmenes de otros contenedores.</li>
+						<li>Otras opciones de almacenamiento a través de plugins (NFS,ssh)</li>
+						 <p align=center><img style="border: 0;" height="300" src="imagenes/shared-volume.jpg"/></p>
+					</ul>
+					<br>
+				</section>
+				<section data-transition="slide">
+					<p>Aspectos a tener en cuenta</p>
+					<br>
+					<ul align=left>
+						<li> Son mucho más eficientes que el almacenamiento en capas AUFS.</li>
+						<li>Los volúmenes se inicializan cuando se crea un contenedor.</li>
+						<li>Si la imagen del contenedor contiene datos en el directorio de montaje, se copian al volumen (ver comando VOLUME).</li>
+						<li>Los volúmenes se pueden compartir y reutilizar</li>
+						<li>Al actualizar una imagen (commit) no se almacenan los datos del volumen.</li>
+						<li>Si se borra un contenedor, la información de los volúmenes persiste.</li>
+					</ul>
+					<br>
+				</section>
+<section data-transition="slide">
+<br>
+<h2>Uso de volúmenes</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Lanzar un contenedor sin persistencia
+$ docker run --rm --name miBD -p3306:3306 -e MYSQL_ROOT_PASSWORD=clave -d mysql:latest
+</code></pre>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Lanzarlo con persistencia en una ruta gestionada por Docker
+$ docker run --name miBD -p3306:3306 -v /var/lib/mysql  -e MYSQL_ROOT_PASSWORD=clave -d mysql:latest
+
+$ docker inspect miBD  --format "{{json .Mounts}}"
+[{"Type":"volume","Name":"5459c2a6e0933c1313e4db0c613f8e3891f2f22c5a90177a4e5caaad0926e571",
+"Source":"/var/lib/docker/volumes/5459c2a6e0933c1313e4db0c613f8e3891f2f22c5a90177a4e5caaad0926e571/_data",
+"Destination":"/var/lib/mysql","Driver":"local","Mode":"","RW":true,"Propagation":""}]
+</code></pre>
+<br>
+<p align=left>Docker tiene comandos de backup, restore y migración de datos de estos volúmenes.</p>
+</section>
+<section data-transition="slide">
+<br>
+<h2>Uso de volúmenes</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Montar un directorio específico del host
+$ docker run --name miBD -p3306:3306 -v /home/experto/datos:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=clave \
+   -d mysql:latest
+
+390ef8ca3ded170598e4ec2f29333f663dc6482d0f01a0605e2c08e24523453f
+
+$ ls datos
+auto.cnf            ib_logfile0         private_key.pem
+ca-key.pem          ib_logfile1         public_key.pem
+ca.pem              ibdata1             server-cert.pem
+client-cert.pem     ibtmp1              server-key.pem
+client-key.pem      mysql               sys
+ib_buffer_pool      performance_schema
+
+# Podeis comprobar que cualquier cambio realizado se ve fuera y dentro del contenedor ;-)
+# Otra prueba, creamos un esquema y una tabla dentro del propio contenedor
+
+$ docker  exec -i miBD sh
+$ mysql -uroot -p -e'create database misdatos; use misdatos; create table mitabla(id integer)'
+
+# Si paramos, eliminamos, y volvemos a crear el contenedor miBD podemos comprobar si la BD persiste:
+
+$ mysql -uroot -p -e'create database misdatos; use misdatos; create table mitabla(id integer)'
+Enter password: clave
+ERROR 1007 (HY000) at line 1: Can't create database 'misdatos'; database exists
+</code></pre>
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Uso de volúmenes</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Otros ejemplos mediante plugins:
+
+Mounting CIFS/Samba Volumes
+	The example below will start a container and mount the specified CIFS server/sharename into a
+	directory called /data in the container.
+
+	Run the plugin or add it to systemd
+	$ sudo docker-volume-netshare cifs --username user --password pass --domain domain
+	Run a container to test:
+	$ docker run -i -t --volume-driver=cifs -v hostname/share:/data ubuntu /bin/bash
+
+Mounting NFS Volumes
+	Run the plugin or add it to systemd
+	$ sudo docker-volume-netshare nfs
+	Run a container to test:
+	$ docker run -i -t --volume-driver=nfs -v hostname/volume:/data ubuntu /bin/bash
+</code></pre>
+<br>
+<p align=left> También es posible montar recursos externos almacenados en AWS o implementar plugins a medida</p>
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Uso de nombres lógicos</h2>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+
+
+$  docker run --name miBD --rm -p3306:3306 -v tablespace:/var/lib/mysql  -e MYSQL_ROOT_PASSWORD=clave \
+   -d mysql:latest
+
+$ docker inspect miBD  --format "{{json .Mounts}}"
+[{"Type":"volume","Name":"tablespace","Source":"/var/lib/docker/volumes/tablespace/_data",
+"Destination":"/var/lib/mysql","Driver":"local","Mode":"z","RW":true,"Propagation":""}]
+localhost:~$
+
+# volume ls, create inspect, rm
+$ docker volume ls
+
+DRIVER              VOLUME NAME
+local               16c17e14a45731627e68fee084d68e2153557f8a10f0630afa365414e4d67c11
+local               tablespace
+
+$ docker volume inspect tablespace
+[
+    {
+        "Driver": "local",
+        "Labels": {},
+        "Mountpoint": "/var/lib/docker/volumes/tablespace/_data",
+        "Name": "tablespace",
+        "Options": {},
+        "Scope": "local"
+    }
+]
+</code></pre>
+</section>
+<section data-transition="slide">
+<br>
+<h2>Compartir volúmenes entre contenedores</h2>
+
+<p align=left>Varios contenedores pueden compartir los volúmenes definidos en uno de ellos.</p>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+
+# Contenerdor "absurdo"
+
+$ docker create -v /var/lib/mysql --name dbstore mysql:latest /bin/true
+
+$ docker run --name miBD -p3306:3306 --volumes-from dbstore -e MYSQL_ROOT_PASSWORD=clave -d mysql:latest
+
+$ docker ps -a
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
+ee8820644a2a        mysql:latest        "docker-entrypoint..."   14 minutes ago      Up 14 minutes       0.0.0.0:3306->3306/tcp   miBD
+53b7fa4a66a0        mysql:latest        "docker-entrypoint..."   15 minutes ago      Created                                      dbstore
+
+$ docker inspect miBD  --format "{{json .Mounts}}"
+[{"Type":"volume","Name":"16c17e14a45731627e68fee084d68e2153557f8a10f0630afa365414e4d67c11",
+"Source":"/var/lib/docker/volumes/16c17e14a45731627e68fee084d68e2153557f8a10f0630afa365414e4d67c11/_data",
+"Destination":"/var/lib/mysql","Driver":"local","Mode":"","RW":true,"Propagation":""}]
+</code></pre>
+<p align=left>El contenedor dbstore puede estar parado y compartir sus volúmenes. Precaución con los accesos concurrentes !!</p>
+<br>
+</section>
+
+<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>Docker Hub</h2>
+				</section>
+
+				<section data-transition="fade-in">
+					<h2>Un lugar donde puedes encontrar de todo...</h2>
+					<br>
+					<p  align=center><img style="border: 0;" height="300" src="imagenes/cantina.gif"></p>
+				</section>
+
+
+				<section data-transition="slide">
+					<p align=left>Es un repositorio global abierto a todo el mundo por tanto nos podemos encontrar con:</p>
+					<br>
+						<ul align=left>
+						<li>Imágenes oficiales de empresas o comunidades.</li>
+						<li>Proyectos personales propios o basados en el trabajo de otros.</li>
+						<li>Proyectos dudosos, caballos de Troya, malware...</li>
+					</ul>
+					<br>
+					<p align=left>Además es el repositorio por defecto!</p>
+					<br>
+					<p align=left>Rolling update: los contenedores no se actualizan por hacer pull de una nueva imagen. Se implementa vía script o en servicios desplegados sobre Swarm, Mesos o Kubernetes</p>
+				</section>
+
+				<section data-transition="fade-in">
+					<img style="border: 0;" height="500" src="imagenes/hub1.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Repositorios oficiales, los más seguros</h2>
+					<img style="border: 0;" height="450" src="imagenes/oficial.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Tags y escaneo de imágenes</h2>
+					<img style="border: 0;" height="480" src="imagenes/escaneo.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Búsqueda desde linea de comandos</h2>
+					<img style="border: 0;" height="400" src="imagenes/search.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Creación y uso de una cuenta propia de Docker Hub</h2>
+					<img style="border: 0;" height="400" src="imagenes/login.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Docker registry</h2>
+					<img style="border: 0;" height="400" src="imagenes/registry.png"/>
+					<p align=left>Otras alternativas: Artifactory, Nexus...</p>
+				</section>
+				<!-- Introducir ejercicios -- Hacer una demo con Docker hub-->
+
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>DOCKERFILE</h2>
+				</section>
+				<section data-transition="fade-in">
+					<h2>¿Que hemos aprendido?</h2>
+					<ul align=left>
+						<li>Qué es Docker y como trabajar con contenedores.</li>
+						<li>Comandos básicos para operar con imágenes.</li>
+						<li>Buscar y descargar nuevas imágenes en Docker Hub.</li>
+					</ul>
+					<br>
+					<p align=center class="fragment"><img style="border: 0;" height="300" src="imagenes/lego.png"/>
+					<br>¡Es hora de construir nuestras propias imágenes!</p>
+				</section>
+				<section data-transition="slide">
+					<h2>Dockerfile</h2>
+					<ul align=left>
+						<li>Define servicios, no aplicaciones completas.</li>
+						<li>Se suele partir de una imagen base.</li>
+						<li>Mediante comandos añadimos ficheros, exponemos puertos y ejecutamos comandos.</li>
+					</ul>
+					<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM jboss/wildfly:10.1.0.Final
+LABEL autor="José Luis Zamora Sánchez"
+EXPOSE 8080 9990
+RUN /opt/jboss/wildfly/bin/add-user.sh experto experto --silent
+COPY target/cursos.war /opt/jboss/wildfly/standalone/deployments/
+CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+<br>
+<p align=left>Usar <b>FROM SCRATCH</b> para empezar con una imagen vacia.</p>
+				</section>
+				<section data-transition="slide">
+					<h2>Construir una imagen (Desde Alpine Linux)</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Preparar el entorno
+$ sudo apk update
+$ sudo apk add maven
+$ sudo apk add openjdk8
+
+# Descargar el proyecto de Git Hub
+$ git clone https://github.com/Djbyte1977/cursos.git
+
+# Compilar y construir el war
+$ mvn package # Entrar en la carpeta cursos y compilar el proyecto
+
+# Por usar una librería de C especial, la ejecución de la imagen fallará
+# Comentar añadiendo un # las líneas CMD y RUN del Dockerfile
+
+  FROM jboss/wildfly:10.1.0.Final
+  LABEL autor = "Jose Luis Zamora Sanchez"  
+  EXPOSE 8080 9990
+  # RUN /opt/jboss/wildfly/bin/add-user.sh experto experto --silent
+  COPY target/cursos.war /opt/jboss/wildfly/standalone/deployments/
+  # CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+
+
+# Ojo con el punto. Sustituir "usuario" por vuestro login en Docker Hub
+$ docker build -t usuario/cursos .
+</code></pre>
+				</section>
+				<section data-transition="slide">
+					<h2>Construir una imagen (Generic)</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Descargar el proyecto de Git Hub
+$ git clone https://github.com/Djbyte1977/cursos.git
+
+# Compilar y construir el war
+$ mvn package # Entrar en la carpeta cursos y compilar el proyecto
+
+# Ojo con el punto. Sustituir "usuario" por vuestro login en Docker Hub
+
+$ docker build -t usuario/cursos .
+
+# Aquí si que se podrá construir la imagen ejecutando todos los comandos.
+
+# Construir un contenedor y probarlo con curl http://localhost:8080/cursos/resources/cursos
+
+$ docker run -d --rm -p 8080:8080 usuario/cursos:latest
+
+# Aquí veréis como los comandos se ejecutan para construir la imagen y en caso de fallo se
+# muestra el detalle del error
+
+
+</code></pre>
+</section>
+
+				<section data-transition="slide">
+					<h2>Construir una imagen (II)</h2>
+					<p align=left></p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+usuario/cursos      latest              08618bf4bb09        4 minutes ago       583 MB
+mysql               latest              7666f75adb6b        11 days ago         406 MB
+tomcat              9-alpine            ece52517e252        2 weeks ago         135 MB
+registry            2                   d1e32b95d8e8        3 weeks ago         33.2 MB
+alpine              latest              88e169ea8f46        6 weeks ago         3.98 MB
+jboss/wildfly       10.1.0.Final        a6b9ec785de9        7 weeks ago         583 MB
+</code></pre>
+					<br>
+					<p align=left> La nueva imagen ocupa 600Mb al incluir un filesystem de Ubuntu</p>
+				</section>
+				<section data-transition="slide">
+					<h2>Construir una imagen (III)</h2>
+					<p align=left></p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Inspeccionar los detalles de una imagen
+$ docker inspect usuario/cursos  --format "{{json .RootFS}}"
+
+</code></pre>
+					<br>
+					<ul align=left>
+						<li> Cada comando del Dockerfile añade una capa a la imagen final.</li>
+						<li> Los comandos se deben ordenar de menor a mayor variabilidad.</li>
+						<li> Es posible concatenar comandos para evitar capas intermedias.</li>
+					</ul>
+				</section>
+				<section data-transition="slide">
+					<h2>Construir una imagen (IV)</h2>
+					<p align=left></p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Inspeccionar el historial de cambios de una imagen
+$ docker history usuario/cursos
+</code></pre>
+					<p align=center><img style="border: 0;" height="300" src="imagenes/history.png"/></p>
+				</section>
+				<section data-transition="slide">
+					<h2>Construir una imagen (V)</h2>
+					<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Construir una imagen y etiquetarla
+$ docker build -t usuario/cursos:v1.0 .
+
+# Subir nuestra imagen a Docker Hub y compartirla
+$ docker push usuario/cursos
+</code></pre>
+					<br>
+					<p align=left>Si se hace push de una misma imagen-etiqueta se sobrescribe en Docker Hub sin avisar.</p>
+				</section>
+				<section data-transition="slide">
+					<h2>Optimizar tamaño (I)</h2>
+					<ul align=left>
+						<li> Utilizar una base más ligera. Alpine Linux parte de 5mb y tiene un sistema de paquetes muy completo.</li>
+						<li>Concatenar comandos intermedios para evitar incluir ficheros temporales.</li>
+						<li>Indicar mediante comandos específicos aquello que necesitamos descartando lo demás.</li>
+					</ul>
+					<br>
+				</section>
+				<section data-transition="slide">
+					<h2>Base Alpine con Java</h2>
+					</br>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Una imagen de 108Mb con Linux y el JRE 8
+$ docker run -it --name alpine openjdk:8-jre-alpine sh
+
+# Vamos a ejecutar unos comandos en modo interactivo. Ojo que somos ROOT en el contenedor
+$ mkdir /opt
+$ cd /opt
+$ wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip
+$ unzip wildfly-10.1.0.Final.zip
+$ rm wildfly-10.1.0.Final.zip
+$ ln -s wildfly-10.1.0.Final wildfly
+$ cd wildfly/bin
+$ ./standalone.sh
+</code></pre>
+				</section>
+				<section data-transition="slide">
+				<h2>Optimizando (II)</h2>
+				<br>
+				<p align=left>Modificar el Dockerfile para integrar los cambios que hemos probado</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+EXPOSE 8080 9990
+WORKDIR /opt
+RUN wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip
+RUN unzip wildfly-10.1.0.Final.zip
+RUN rm wildfly-10.1.0.Final.zip
+RUN ln -s wildfly-10.1.0.Final wildfly
+RUN ./wildfly/bin/add-user.sh experto experto --silent
+COPY target/cursos.war /opt/wildfly/standalone/deployments/
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+					<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Compilamos indicando un nuevo nombre de imagen
+$ docker build -t usuario/alpinecursos:v1.0 .
+
+$ docker images
+REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
+usuario/alpinecursos      v1.0                3795a2ee0c89        6 minutes ago       411 MB
+</code></pre>
+				</section>
+				<section data-transition="slide">
+					<h2>Optimizando (III)</h2>
+					</br>
+					<p align=left>Concatenar comandos para omitir pasos temporales.</p>
+					<br>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+EXPOSE 8080 9990
+WORKDIR /opt
+RUN wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip && \
+    unzip wildfly-10.1.0.Final.zip && \
+    rm wildfly-10.1.0.Final.zip && \
+    ln -s wildfly-10.1.0.Final wildfly
+RUN ./wildfly/bin/add-user.sh experto experto --silent
+COPY target/cursos.war /opt/wildfly/standalone/deployments/
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+<p> 583MB ==> 271MB !!!</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
+usuario/alpinecursos      v1.0                1f786bbb8c24        4 seconds ago       271 MB
+
+#Probad a ejecutar un docker history usuario/alpinecursos para tener más detalle
+</code></pre>
+				</section>
+				<section data-transition="slide">
+					<h2>Prueba y publicación del servicio</h2>
+					</br>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Una imagen de 108Mb con Linux y el JRE 8
+$ docker run -d --rm --name cursos -p8080:8080 -p9990:9990 usuario/alpinecursos
+
+$ curl http://localhost:8080/cursos/resources/cursos
+{"cursos":"JavaEE, JavaScript, MongoDB"}
+
+$ docker push usuario/alpinecursos
+</code></pre>
+<br>
+<p align=left>Si se actualiza el WAR solo cambia la última capa (4Kb)</p>
+<br>
+<p align=center>
+<a href="https://docs.docker.com/engine/userguide/eng-image/dockerfile_best-practices/" target="_blank">Best Practices for writing Dockerfiles</a></li><p>
+				</section>
+				<section data-transition="slide">
+					<p>Flexibilizar los deployments</p>
+					</br>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+EXPOSE 8080 9990
+WORKDIR /opt
+RUN wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip && \
+    unzip wildfly-10.1.0.Final.zip && \
+    rm wildfly-10.1.0.Final.zip && \
+    ln -s wildfly-10.1.0.Final wildfly
+RUN ./wildfly/bin/add-user.sh experto experto --silent
+
+#COPY target/cursos.war /opt/wildfly/standalone/deployments/
+VOLUME /opt/wildfly/standalone/deployments/
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+localhost:/var/lib/docker/volumes/56e4f067e31ec242df718cd3055e0c3bc480a42c2eb6704f8f851286f6ca3403/_data# ls -la
+total 20
+drwxr-xr-x    2 root     root          4096 Feb 11 23:50 .
+drwxr-xr-x    3 root     root          4096 Feb 11 23:50 ..
+-rw-r--r--    1 root     root          8870 Feb 10 23:03 README.txt
+</code></pre>
+<br>
+<p align=left>Se puede montar el volumen en una ruta específica (-v)</p>
+				</section>
+				<section data-transition="slide">
+					<p>Ejecutar el servicio como usuario no privilegiado</p>
+					</br>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+EXPOSE 8080 9990
+WORKDIR /opt
+
+RUN adduser experto -D
+RUN chown experto /opt
+USER experto
+
+RUN wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip && \
+    unzip wildfly-10.1.0.Final.zip && \
+    rm wildfly-10.1.0.Final.zip && \
+    ln -s wildfly-10.1.0.Final wildfly
+RUN ./wildfly/bin/add-user.sh experto experto --silent
+
+VOLUME /opt/wildfly/standalone/deployments/
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+<br>
+<p align=left>Sin embargo no es posible trabajar con volúmenes dentro de un contenedor usando un usuario que no sea root </p>
+				</section>
+				<section data-transition="slide">
+					<p>Variables en Dockerfile</p>
+					</br>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+ARG WF_IMG_VER=10.1.0.Final
+EXPOSE 8080 9990
+WORKDIR /opt
+RUN wget http://download.jboss.org/wildfly/${WF_IMG_VER}/wildfly-${WF_IMG_VER}.zip && \
+    unzip wildfly-${WF_IMG_VER}.zip && \
+    rm wildfly-${WF_IMG_VER}.zip && \
+    ln -s wildfly-${WF_IMG_VER} wildfly
+RUN ./wildfly/bin/add-user.sh experto experto --silent
+VOLUME /opt/wildfly-${WF_IMG_VER}/standalone/deployments
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+<br>
+<p align=left>Para cambiar el valor por defecto:</p>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker  build --build-arg WF_IMG_VER=9.0.1.Final -t djbyte1977/alpinecursos .
+</code></pre>
+				</section>
+<section data-transition="slide">
+					<p>Variables de entorno</p>
+					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+ARG WF_IMG_VER
+ENV TCP_STACK IPV4
+
+# El comando ENV sobrescribe las variables del mismo nombre.
+
+ENV WF_IMG_VER ${WF_IMG_VER:-10.1.0.Final}
+EXPOSE 8080 9990
+WORKDIR /opt
+RUN wget http://download.jboss.org/wildfly/${WF_IMG_VER}/wildfly-${WF_IMG_VER}.zip && \
+    unzip wildfly-${WF_IMG_VER}.zip && \
+    rm wildfly-${WF_IMG_VER}.zip && \
+    ln -s wildfly-${WF_IMG_VER} wildfly
+RUN ./wildfly/bin/add-user.sh expertojava expertojava --silent
+VOLUME /opt/wildfly-${WF_IMG_VER}/standalone/deployments
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+<p align=left>Las variables de entorno persisten en la imagen y se exponen al contenedor.</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$  docker build -t usuario/cursos:v1.0 .                  				 # Sin especificar --build-arg
+$ docker run --rm -it -p 8080:8080 usuario/cursos:v1.0 sh
+/opt # env
+WF_IMG_VER=10.1.0.Final
+TCP_STACK=IPV4
+</code></pre>
+				</section>
+				<section data-transition="slide">
+					<p>Comandos CMD y ENTRYPOINT</p>
+					<br>
+				<p align=left>Ambos comandos especifican qué proceso se tiene que lanzar al ejecutar un contenedor. Reglas de uso:</p>
+				<br>
+				<ul align=left>
+				<li>En un Dockerfile necesariamente debe aparecer al menos una instrucción CMD o ENTRYPOINT.</li>
+				<li>ENTRYPOINT se debe utilizar cuando el contenedor vaya a funcionar como un ejecutable.</li>
+				<li>CMD se puede utilizar en combinación con ENTRYPOINT para especificar parámetros por defecto.</li>
+				<li>Si hay varios CMD o ENTRYPOINT solo se tendrá en cuenta la última instrucción.</li>
+				<li>La instrucción CMD se podrá sobrecargar añadiendo un parámetro al ejecutar el contenedor</li>
+				</ul>
+				</section>
+				<section data-transition="slide">
+					<p>Comandos CMD y ENTRYPOINT</p>
+					<br>
+				<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM alpine
+WORKDIR /opt
+ENTRYPOINT ["/usr/bin/wc"]
+CMD ["--help"]
+</code></pre>
+<br>
+				<p align=left>Ejecución con parámetros por defecto y parámetros específicos:</p>
+<br>
+				<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run -it -v $(pwd):/opt/ --rm --name=wc djbyte1977/wc                   #Mostrará la ayuda por defecto
+
+$ docker run -it -v $(pwd):/opt/ --rm --name=wc djbyte1977/wc -c Dockerfile
+</code></pre>
+				</section>
+				<section data-transition="slide">
+				<p>.dockerignore</p>
+				<br>
+				<ul>
+					<li>Permite excluir ficheros y directorios al ejecutar instrucciones COPY/ADD.</li>
+					<li>Misma sintaxis que .gitignore.</li>
+					<li>Es especialmente útil para proyectos JS.</li>
+				</ul>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Comentario
+modules/* 	#Ignora cualquier fichero o directorio dentro de la carpeta modules de la raiz del proyecto.
+temp?		#Ignora cualquier fichero o directorio cuyo nombre empiece por temp y tenga un caracter adicional cualquiera.
+*/temp*		#Ignora cualquier fichero o directorio cuyo nombre empiece por temp y se encuentre en un subdirectorio del raiz
+
+			#Ejemplo: carpeta/temporal
+</code></pre>
+				</section>
+				<section data-transition="slide">
+					<h2>Construcciones automáticas</h2>
+					<img style="border: 0;" height="400" src="imagenes/CI1.png"/>
+					<p align=left><a href="https://hub.docker.com/u/njmittet/" target="_blank">Repositorio de ejemplo</a><p>
+				</section>
+				<section data-transition="slide">
+					<h2>Construcciones automáticas</h2>
+					<img style="border: 0;" height="400" src="imagenes/CI2.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Construcciones automáticas</h2>
+					<img style="border: 0;" height="400" src="imagenes/CI3.png"/>
+				</section>				
+				<section data-transition="slide">
+					<h2>Para más información...</h2>
+					<br>
+					<p align><a href="https://docs.docker.com/engine/reference/builder/" target="_blank">Dockerfile reference</a></p>
+					<p align=center><img style="border: 0;" height="400" src="imagenes/china.jpg"/></p>
+				</section>
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>NETWORKING</h2>
+				</section>
+				<section data-transition="fade-in">
+					<h2>Mejor en compañia</h2>
+					<img style="border: 0;" height="400" src="imagenes/penguin.jpg"/>
+					<p align=left>Aprenderemos a trabajar con múltiples contenedores interactuando entre sí.</p> 
+				</section>
+				<section data-transition="slide">
+					<h2>Networking</h2>					
+					<ul>
+						<li>Por defecto, si ejecutamos varios contenedores en un host no tienen "visibilidad" entre sí.</li>
+						<li>Docker permite definir grupos de contenedores conectados entre sí, y aislados de otros. Ejemplo: Arquitectura en 3 capas.</li>
+						<li>Por defecto Docker implementa 3 redes:</li>
+					</ul>
+					<br>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+docker network ls
+
+NETWORK ID		NAME		DRIVER		SCOPE
+27daf57e88c3		bridge		bridge		local
+09f184e43350		host			host			local
+fde6b8b6a6d4		none			null			local
+
+docker run --network=(NETWORK)
+
+</code></pre>
+<p align=left>Cada red tiene su driver asociado. Hay otros drivers, (overlay, macvlan) utilizados en Docker Swarm.</p>
+				</section>
+				<section data-transition="slide">
+					<h2><i>none</i></h2>					
+					<p align=left>Apropiada para un contenedor sin funcionalidad de red (únicamente dirección de loopback)</p>
+					<br>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker attach nonenetcontainer
+
+root@0cb243cd1293:/# cat /etc/hosts
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+root@0cb243cd1293:/# ifconfig
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+root@0cb243cd1293:/#
+</code></pre>
+				</section>
+				<section data-transition="slide">
+					<h2><i>host</i></h2>
+					<p align=left>Host: Esta red compartiría el stack de red del propio host. No es necesario mapear puertos.</p>
+					<br>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run --rm -d --network=host usuario/cursos:v1.0
+$ ifconfig | grep addr
+docker0   Link encap:Ethernet  HWaddr 02:42:13:63:24:80
+          inet addr:172.17.0.1  Bcast:0.0.0.0  Mask:255.255.0.0
+eth0      Link encap:Ethernet  HWaddr 08:00:27:53:96:28
+          inet addr:10.0.2.15  Bcast:0.0.0.0  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:fe53:9628/64 Scope:Link
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+
+$ curl localhost:8080
+$ curl 10.0.2.15:8080
+</code></pre>
+				</section>				
+				<section data-transition="slide">
+					<h2><i>bridge</i></h2>
+					<p align=left>Es la red por defecto. Utiliza la interfaz docker0 del host:</p>
+					<br>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ ifconfig
+
+docker0   Link encap:Ethernet  HWaddr 02:42:47:bc:3a:eb
+          inet addr:172.17.0.1  Bcast:0.0.0.0  Mask:255.255.0.0
+          inet6 addr: fe80::42:47ff:febc:3aeb/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:9001  Metric:1
+          RX packets:17 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:8 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:1100 (1.1 KB)  TX bytes:648 (648.0 B)
+</code></pre>
+</section>
+<section data-transition="slide">
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker network inspect bridge
+[
+   {
+       "Name": "bridge",
+       "Id": "f7ab26d71dbd6f557852c7156ae0574bbf62c42f539b50c8ebde0f728a253b6f",
+       "Scope": "local",
+       "Driver": "bridge",
+       "IPAM": {
+           "Driver": "default",
+           "Config": [
+               {
+                   "Subnet": "172.17.0.1/16",
+                   "Gateway": "172.17.0.1"
+               }
+           ]
+       },
+       "Containers": {},
+       "Options": {
+           "com.docker.network.bridge.default_bridge": "true",
+           "com.docker.network.bridge.enable_icc": "true",
+           "com.docker.network.bridge.enable_ip_masquerade": "true",
+           "com.docker.network.bridge.host_binding_ipv4": "0.0.0.0",
+           "com.docker.network.bridge.name": "docker0",
+           "com.docker.network.driver.mtu": "9001"
+       },
+       "Labels": {}
+   }
+]
+</code></pre>
+</section>
+<section data-transition="slide">
+					<h2><i>bridge</i></h2>
+					<br>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Lanzamos 2 contenedores tomcat
+
+$ docker run -d --rm --name tomcat1 tomcat:9-alpine
+$ docker run -d --rm --name tomcat2 tomcat:9-alpine
+
+$ docker network inspect bridge  --format "{{json .Containers}}"
+
+{
+            "2ae238255102d248e56b6d619574ac54566c2f5aa2695115e39772c426f72205": {
+                "Name": "tomcat1",
+                "EndpointID": "59d0dab709956f53f656bdce833c4c4b46d64782fbdd9d0f1499d206d7653df4",
+                "MacAddress": "02:42:ac:11:00:02","IPv4Address": "172.17.0.2/16","IPv6Address": ""
+            },
+            "53bc77014f13ba589fc40ba5a909de14f88b89ec8016ef58a5c303c97de1ff6f": {
+                "Name": "tomcat2",
+                "EndpointID": "0318f6ad7ffdcc70438872acf3b68c2f84c79bbdae27d2a761f94e6b44047c6f",
+                "MacAddress": "02:42:ac:11:00:03","IPv4Address": "172.17.0.3/16","IPv6Address": ""
+            }
+
+</code></pre>
+<br>
+<p align=left>Observamos que todos los contenedores se encuentran accesibles a través de una subred asociada a la interfaz docker0. ¿Se pueden comunicar entre ellos vía TCP/IP?</p>
+</section>
+<section data-transition="slide">
+					<h2><i>bridge</i></h2>
+					<br>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Vamos a hacer una serie de pruebas
+
+$ docker kill tomcat2
+$ docker run -it --rm --name bb1 busybox
+/# ping 172.17.0.2
+PING 172.17.0.2 (172.17.0.2): 56 data bytes
+64 bytes from 172.17.0.2: seq=0 ttl=64 time=0.054 ms
+64 bytes from 172.17.0.2: seq=1 ttl=64 time=0.075 ms
+64 bytes from 172.17.0.2: seq=2 ttl=64 time=0.076 ms
+
+ wget 172.17.0.2:8080
+Connecting to 172.17.0.2:8080 (172.17.0.2:8080)
+index.html           100% |*******************************************************| 11236   0:00:00 ETA
+/
+</code></pre>
+<br>
+<p align=left>Por tanto los contenedores están agrupados en una subred, interconectados entre sí.</p>
+<p align=left>Docker permite comunicar contenedores sin tener que añadir configuración hardcodeada.</p>
+</section>
+<section data-transition="slide">
+					<h2>Enlaces</h2>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker run --name miBD -p3306:3306 -e MYSQL_ROOT_PASSWORD=clave -d mysql:latest
+#Observar la IP del contenedor dentro de la red bridge
+$ docker network inspect bridge
+
+#Ejecutamos un contenedor "cliente" (misma imagen) con el parámetro --link:
+
+docker run -it --rm --link miBD --name cliente mysql:latest sh
+
+$ cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.17.0.2      miBD 36bb96d37a87
+172.17.0.3      0f6b8ded038e
+</code></pre>
+<br>
+<p align=left>Docker inyecta la información necesaria para acceder al contenedor miBD mediante un nombre lógico. </p>
+</section>
+<section data-transition="slide">
+<br>
+					<h2>Enlaces</h2>
+<p align=left>El "truco" está en que Docker sustituye estos ficheros por ficheros externos configurador por él:</p>
+<br>
+					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+
+$ cat /proc/mounts
+
+/dev/sda1 /etc/resolv.conf ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+/dev/sda1 /etc/hostname ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+/dev/sda1 /etc/hosts ext4 rw,relatime,errors=remount-ro,data=ordered 0 0
+
+</code></pre>
+
+<br>
+<p align=left>Ejemplo de cómo lanzar el cliente para que conecte automáticamente con la BD:</p>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+docker run -it --rm --link miBD --name cliente mysql:latest sh -c 'exec mysql -h"miBD" -P"3306" -uroot -p"clave"'
+</code></pre>
+<br>
+
+
+</section>
+<section data-transition="slide">
+<h2>User networks</h2>
+<img style="border: 0;" height="500" src="imagenes/usernetwork.png"/>
+</section>
+<section data-transition="slide">
+<h2>User networks (II)</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker network create simple
+
+$ docker network inspect simple
+[
+    {
+        "Name": "simple",
+        "Id": "c8b5d18bbd7a46bc52683593fbc68dd3802b1129cc141d41ca935fc26cd983fd",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": {},
+            "Config": [
+                {
+                    "Subnet": "172.18.0.0/16",
+                    "Gateway": "172.18.0.1/16"
+                }
+            ]
+        },
+        "Internal": false,
+        "Containers": {},
+        "Options": {},
+        "Labels": {}
+    }
+]
+</code></pre>
+</section>
+<section data-transition="slide">
+<h2>User networks (III)</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Movemos un contenedor a la nueva red "simple"
+$ docker network connect simple miBD
+$ docker network disconnect bridge miBD
+
+$ docker network inspect simple
+
+...
+
+        "Containers": {
+            "e383a098c1a64e7438ee401f4533e35d0acd2754dea79820125cec1f9087650d": {
+                "Name": "miBD",
+                "EndpointID": "d8cecb0726d2aa85d85d540c048cf35a9e215b3b3f2a7ccc6c16a587d4dd1779",
+                "MacAddress": "02:42:ac:12:00:02",
+                "IPv4Address": "172.18.0.2/16",
+                "IPv6Address": ""
+            }
+
+# Creamos un nuevo contenedor directamente en la nueva red
+$ docker run --rm --network=simple -it --link miBD --name cliente mysql:latest sh -c 'exec mysql -h"miBD" -P"3306" -uroot -p"clave"'
+
+</code></pre>
+</section>
+<section data-transition="slide">
+<h2>DNS embebido</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Lanzamos un sh dentro de la red simple:
+
+$ docker run --rm --network=simple -it --name cliente mysql:latest sh
+
+$ ping miBD
+PING miBD (172.18.0.2): 56 data bytes
+64 bytes from 172.18.0.2: icmp_seq=0 ttl=64 time=0.046 ms
+64 bytes from 172.18.0.2: icmp_seq=1 ttl=64 time=0.049 ms
+64 bytes from 172.18.0.2: icmp_seq=2 ttl=64 time=0.087 ms
+64 bytes from 172.18.0.2: icmp_seq=3 ttl=64 time=0.077 ms
+</code></pre>
+<br>
+<p align=left>Docker implementa un servicio de DNS dentro de las redes de usuario utilizando propiedades como el nombre de un contenedor. El parámetro --link no es necesario.</p>
+</section>
+
+				<section data-transition="slide">
+					<h2>Para más información...</h2>
+					<br>
+					<p align><a href="https://docs.docker.com/engine/userguide/networking/work-with-networks/" target="_blank">Work with network commands</a></p>
+					<p align=center><img style="border: 0;" height="400" src="imagenes/cable-mess.jpg"/></p>
+				</section>
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>DOCKER COMPOSE</h2>
+				</section>
+				<section data-transition="fade-in">
+					<ul>
+						<li>Permite definir aplicaciones aplicaciones multi-contenedor y gestionarlas como uno solo.</li>
+						<li>Inicialmente para despliegues en un solo host. V3 admite despliegues sobre Swarm.</li>
+					</ul>
+					<p align=center><img style="border: 0;" height="200" src="imagenes/compose.png"/></p>
+					<p align=left>docker-compose.yml</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+version: '2'
+services:
+  web:
+    build: .
+    ports:
+     - "8080:8080"
+     - "9990:9990"
+
+</code></pre>
+				</section>
+				<section data-transition="slide">
+					<p align=center><img style="border: 0;" height="500" src="imagenes/compose-cmds.png"/></p>
+				</section>
+				<section data-transition="slide">
+				<p align=left>Arranque y parada de aplicaciones</p>
+				<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# levantar aplicación en modo interactivo (añadir -d para modo background)
+
+$ docker-compose up
+Creating network "cursos_default" with the default driver
+Creating cursos_web_1
+Attaching to cursos_web_1
+web_1  | =========================================================================
+web_1  |
+web_1  |   JBoss Bootstrap Environment
+web_1  |
+web_1  |   JBOSS_HOME: /opt/wildfly
+web_1  |
+
+...
+ ^CGracefully stopping... (press Ctrl+C again to force)
+Stopping cursos_web_1 ...
+</code></pre>
+<br>
+<ul>
+	<li>Un servicio puede estar compuesto por 1 o más contenedores en ejecución (escalado). [Carpeta]-[servicio]-[instancia].</li>
+	<li>Se crea una red específica para comunicar los contenedores.</li>
+</ul>
+					
+				</section>
+				<section data-transition="slide">
+				<p align=left>Arranque y parada de aplicaciones</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# levantar aplicación en modo interactivo (añadir -d para modo background)
+
+$ docker-compose up -d
+Creating network "cursos_default" with the default driver
+Creating cursos_web_1
+
+#Listar servicios vs listar contenedores
+
+$ docker-compose ps
+    Name                  Command               State                       Ports
+------------------------------------------------------------------------------------------------------
+cursos_web_1   /opt/wildfly/bin/standalon ...   Up      0.0.0.0:8080->8080/tcp, 0.0.0.0:9990->9990/tcp
+
+$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+c40541024f0b        cursos_web          "/opt/wildfly/bin/..."   9 minutes ago       Up 5 minutes        0.0.0.0:8080->8080/tcp, 0.0.0.0:9990->9990/tcp   cursos_web_1
+
+# Parar la aplicación
+
+$ docker-compose down
+</code></pre>
+<br>
+				</section>
+				<section data-transition="slide">
+				<p align=left>Comandos</p>
+				<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Cuando se construye un contendor desde docker-compose, no se destruyen salvo orden expresa
+
+$ docker-compose up   -d --force-recreate 
+
+
+# Recoger los logs de todos los contenedores de la aplicación
+
+$ docker-compose logs -f
+Attaching to cursos_web_1
+...
+
+# Ejecutar un comando en un servicio activo (iniciándolo si es preciso)
+
+$ docker-compose run web env
+
+# Borrar los contendores creados por compose
+
+$ docker-compose rm 
+</code></pre>
+
+<br>
+</section>
+<section data-transition="slide">
+<p align=left>Multi-contenedor</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+version: '2'
+services:
+  db:
+     image: mysql:5.7
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+  web:
+    build: .
+    ports:
+     - "8080:8080"
+     - "9990:9990"
+    depends_on:
+     - db
+</code></pre>
+<br>
+<ul>
+	<li>Podemos desplegar servicios a partir de una imagen de Docker Hub u otro repositorio.</li>
+	<li>Compose respeta el orden de ejecución de los servicios <i>depends_on</i>, pero no espera a que un servicio esté inicializado para pasar al siguiente.</li>
+</ul>
+</section>
+<section data-transition="slide">
+<p align=left>Multi-contenedor</p>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker-compose up -d
+
+$ docker network inspect cursos_default | grep Name
+ "Name": "cursos_default",
+                "Name": "cursos_web_1",
+                "Name": "cursos_db_1",
+
+$ docker-compose run web ping db
+PING db (172.20.0.2): 56 data bytes
+64 bytes from 172.20.0.2: seq=0 ttl=64 time=0.050 ms
+64 bytes from 172.20.0.2: seq=1 ttl=64 time=0.068 ms
+64 bytes from 172.20.0.2: seq=2 ttl=64 time=0.041 ms
+</code></pre>
+<br>
+<ul>
+	<li>Al trabajar con una red específica docker implementa un servicio dns para resolver la IP de un contenedor.</li>
+	
+</ul>
+
+<p align=left><br>A continuación veremos un ejemplo más completo...</p>
+</section>
+<section>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+version: '2'
+services:
+   db:
+     image: mysql:5.7
+     volumes:
+       - "./.data/db:/var/lib/mysql"
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+     networks:
+       - privada
+   wordpress:
+     depends_on:
+       - db
+     image: wordpress:latest
+     links:
+       - db
+     ports:
+       - "8000:80"
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_PASSWORD: wordpress
+     networks:
+       - privada
+networks:  
+  privada:
+
+</code></pre>
+</section>
+<section>
+<p align=left>Wordpress con Docker Compose</p>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker-compose up -d
+
+$ docker network ls
+NETWORK ID          NAME                DRIVER              SCOPE
+dcc4ecec5157		bridge				bridge			local
+0999e7d92f40		cursos_default			bridge			local
+4d9c5aacd800		cursos_privada			bridge			local
+53cf20f5d488		host					host				local
+c794ec572d00		none				null				local
+
+$ docker network inspect cursos_privada | grep Name
+ "Name": "cursos_privada",
+                "Name": "cursos_wordpress_1",
+                "Name": "cursos_db_1",
+
+# Probar a acceder a la aplicación:
+# http://127.0.0.1:8000 o http://192.168.99.100:8000
+
+# Control específico de los contenedores:
+$ docker-compose stop wordpress
+$ docker-compose start wordpress
+$ docker-compose kill wordpress	   
+
+</code></pre>
+</section>
+				<section data-transition="slide">
+                    <h2>Scaling</h2>
+						<p  align=center><img style="border: 0;" height="450" src="imagenes/compose-scaling.png"></p>
+                </section>
+<section>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+version: '2'
+services:
+  web:
+     depends_on:
+       - db
+     image: wordpress:latest
+     links:
+       - db
+     ports:
+       - 80
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: db:3306
+       WORDPRESS_DB_PASSWORD: wordpress
+     networks:
+      - front-tier
+      - back-tier
+
+  db:
+     image: mysql:5.7
+     volumes:
+       - "./.data/db:/var/lib/mysql"
+     restart: always
+     environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+     networks:
+      - back-tier
+
+ 
+</code></pre>
+</section>
+<section>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+ lb:
+    image: dockercloud/haproxy
+    ports:
+      - 8080:80
+    links:
+      - web
+    networks:
+      - front-tier
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock 
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
+</code></pre>
+
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker-compose up -d
+
+$ docker-compose ps
+    Name                  Command               State                    Ports
+-----------------------------------------------------------------------------------------------
+cursos_db_1		docker-entrypoint.sh mysqld		Up		3306/tcp
+cursos_lb_1		/sbin/tini -- dockercloud- ...			Up		1936/tcp, 443/tcp, 0.0.0.0:8080->80/tcp
+cursos_web_1		docker-entrypoint.sh apach ...		Up		0.0.0.0:32768->80/tcp
+
+# Probar a acceder a la aplicación:
+# http://127.0.0.1:8080 o http://192.168.99.100:8080
+
+</code></pre>
+</section>
+<section data-transition="slide">
+<ul>
+	<li>El punto de entrada es el puerto 8080.</li>
+	<li>HAProxy hace de balanceador conectando con cualquier contenedor en la red front-tier.</li>
+	<li>Mediante compose podemos aumentar o reducir el número de contenedores para ajustarlos a la carga de trabajo.</li>
+</ul>
+<br>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Nos conectamos a los logs del servicio web
+$ docker-compose logs -f --tail=0  web
+
+
+# Escalar servicios:
+
+$ docker-compose scale web=3
+Creating and starting cluster_web_2 ... done
+Creating and starting cluster_web_3 ... done
+
+# Si ejecutamos docker ps veremos como Compose asigna puertos automáticamente a las instancias web
+# Lanzar varias peticiones a través del navegador
+
+$ docker-compose scale web=1
+Stopping and removing cluster_web_2 ... done
+Stopping and removing cluster_web_3 ... done
+
+
+</code></pre>
+
+</section>
+
+<section data-transition="slide">
+<h2>Extends: "Herencia" entre contenedores</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+version: '2'
+services:
+  db:
+     extends:
+        file: database.yml
+        service: db
+     image: mysql:5.7
+     restart: always
+  web:
+    build: .
+    ports:
+     - "8080:8080"
+     - "9990:9990"
+    depends_on:
+     - db
+</code></pre>
+<p align=left>database.yml</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+version: '2'
+db:
+   environment:
+       MYSQL_ROOT_PASSWORD: wordpress
+       MYSQL_DATABASE: wordpress
+       MYSQL_USER: wordpress
+       MYSQL_PASSWORD: wordpress
+</code></pre>
+</section>
+<section data-transition="slide">
+					<h2>Resumen Compose</h2>
+					<br>
+					<ul>
+						<li>Herrramienta para modelar aplicaciones multicontenedor.</li>
+						<li>Tiene sus propios comandos para controlar los contenedores</li>
+						<li>Permite escalar el número de contenedores bajo petición.</li>
+						<li>A partir de docker 1.13 se puede utilizar directamente sobre clusters de Swarm.</li>
+					</ul>
+					
+					<p align=left><br><a href="https://docs.docker.com/compose/compose-file" target="_blank">Manual de referencia de Docker Compose</a>.
+					
+				</section>
+				
+				<!-- Play with docker -->
+				<section class="intro" data-background="#ffebcc" data-transition="zoom">
+					<h2>ECOSISTEMA DOCKER</h2>
+				</section>
+				<section data-transition="fade-in">
+					<img style="border: 0;" height="300" src="imagenes/componentes.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Proyecto Open Source Moby</h2>
+					<p align=left>Docker para seguir creciendo se modulariza en distintos componentes: (runc, containerd..)</p>
+					<p align=left><br>En Abril de 2017 se publica el proyecto Moby:</p>
+					<ul>
+						<li>Librería de componentes backend que implementan distintos subsistemas.</li>
+						<li>Un framework para ensamblar estos componentes en una plataforma de contenedores y herramientas para construir, probar y desplegar contenedores.</p> 
+						<li>Un proyecto de referencia "Moby Origin" que es la base de Docker CE, junto con otros proyectos de ejemplo.</li>
+						
+					</ul>
+					<p align=center><img style="border: 0;" height="100" src="imagenes/moby.png"/></p>
+				</section>
+				<section data-transition="slide">
+					<h2>Cambios Docker Engine 1.13+</h2>
+					<br>
+					<p align=left>Reestructuración de los comandos. Situación previa:</p>
+					<ul>
+						<li>Los comandos de docker son réplicas de comandos Unix, sin otra categorización (dificulta el aprendizaje).</li>
+						<li>Inconsistencias del tipo <i>docker run</i> (acción) <i>docker images</i> (sustantivo plural).</li>
+						<li>Hay comandos muy utilizados (<i>run</i>), situados al mismo nivel que otros con apenas uso (<i>wait</i>).</li>
+					</ul>
+				</section>
+				<section data-transition="slide">
+					<h2>Cambios Docker Engine 1.13+</h2>
+					<br>
+					<p align=left>Nueva estructura de comandos. Categorias:</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+checkpoint	Manage checkpoints
+container		Manage containers
+image		Manage images
+network		Manage networks
+node		Manage Swarm nodes
+plugin		Manage plugins
+secret		Manage Docker secrets
+service		Manage services
+stack		Manage Docker stacks
+swarm		Manage Swarm
+system		Manage Docker
+volume		Manage volumes
+</code></pre>
+<br>
+<p align=left>Subcomandos:</p>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+SUB-COMMAND		PURPOSE
+ls					List [category] (image, container, volume, secret, etc)
+rm					Remove [category]
+inspect				Inspect [category]
+</code></pre>
+					<!--http://blog.arungupta.me/docker-1-13-management-commands/
+					https://blog.nimbleci.com/2016/11/17/whats-coming-in-docker-1-13/-->
+
+</section>
+<section data-transition="slide">
+					<h2>Cambios Docker Engine 1.13+</h2>
+					<br>
+					<p align=left>Subcomando prune</p>
+					<br>
+					<ul>
+						<li>Permite hacer limpieza de elementos húerfanos, que antes sólo se podía realizar vía scripts.</li>
+						<li>Aplica a múltiples categorías de comandos: image, container network, volume...</li>
+						</li>La categoría <i>system</i> implica una limpieza general. OJO!!</li>
+					</ul>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker system prune
+WARNING! This will remove:
+        - all stopped containers
+        - all volumes not used by at least one container
+        - all networks not used by at least one container
+        - all dangling images
+Are you sure you want to continue? [y/N] y
+Deleted Containers:
+bbca4cd02690fd3c7c10b68373a24048f246b46f6c501276a63e096c525a044d
+...
+</code></pre>
+</section>
+<section data-transition="slide">
+					<h2>Cambios Docker Engine 1.13+</h2>
+					<br>
+					<p align=left>Otras mejoras:</p>
+					<br>
+					<ul>
+						<li>Interoperabilidad entre cliente y servidor Docker con API's de distintas versiones.</li>
+						<li>Extensibilidad vía plugins.</li>
+						<li><i>--squash</i> Unificar en una sola capa todas las diferencias con respecto a la imagen base al ejecutar docker build.
+						<li>Despliegue de servicios en "blundles" a clusters de Swarm.</li>
+						<li>Gestión de credenciales (secrets) en clusters de Swarm.</li>
+						
+					</ul>
+				</section>
+
+				<section data-transition="slide">
+					<h2>docker-machine</h2>
+					<br>
+					<ul>
+						<li>Herramienta en línea de comandos para la creación de VM's con el demonio de Docker.</li>
+						<li>Principalmente utilizada desde Windows y MacOS al ser SO's no compatibles con Docker pero también disponible en Linux.</li>
+						<li>Permite crear VM's tanto en local (Hyper-V, VirtualBox)como en cloud (Azure, AWS y otros).</li>
+						<li>Controla la VM "default" que se crea automáticamente en MacOS y Windows.</li>
+						<li>docker-machine proporciona la configuración necesaria para operar cualquier VM con el cliente de docker.</li>
+						<li>Permite crear clusters de Swarm con máquinas locales o remotas.</li>
+						
+					</ul>
+				</section>
+				<section data-transition="slide">
+					<h2>docker-machine</h2>
+					<p align=center><img style="border: 0;" height="500" src="imagenes/dockermachine.png"/></p>
+				</section>
+				<section data-transition="slide">
+					<h2>docker-cloud</h2>
+					<br>
+					<ul>
+						<li>Interfaz web para CI/CD de aplicaciones sobre infraestructura diversa.</li>
+						<li>Independiza las aplicaciones de la infraestructura donde se ejecutarán.</li>
+						<li>Stacks, services, containers. Node Clusters, nodes.</li>
+						<li>docker-cloud.yml</li>
+						<li>Bring your own node: Ubuntu, Debian, Centos, Red Hat Linux, Fedora.</li>
+					</ul>
+				</section>
+				<section data-transition="slide">
+					<h2>Docker Swarm</h2>
+					<p align=left>¿Qué es un cluster?</p>
+					<ul>
+						<li>Un cluster es un conjunto de nodos/hosts que trabajan de forma coordinada como si fuera una uno solo.</li>
+						<li>El trabajo a realizar se comparte entre los distintos nodos, si bien pueden existir nodos maestros que coordinen al resto.</li>
+					</ul>
+					<p align=center><img style="border: 0;" height="100" src="imagenes/docker-swarm-hero.png"/></p>
+					<p align=left>¿Y Swarm?</p>
+					<ul>
+						<li>Es la herramienta que incorporar Docker out-of-the-box para configurar clusters.</li>
+						<li>Es mucho más sencilla de utilizar que Kubernetes/Mesos, pero menos madura de cara a entornos de producción.</li>
+					</ul>
+				</section>
+				<section data-transition="slide">
+					<h2>Docker Swarm</h2>
+					<p align=center><img style="border: 0;" height="400" src="imagenes/docker-swarm.jpg"/></p>
+					<p align=center><a href="http://play-with-docker.com" target="_blank">Play with Docker</a></p>
+					
+				</section>
+				<section data-transition="slide">
+					<h2>Docker Cloud</h2>
+					<p align=center><img style="border: 0;" height="500" src="imagenes/dockercloud.png"/></p>
+				</section>
+				<section>
+					<h2>Portainer</h2>
+						<p align=center><img style="border: 0;" height="500" src="imagenes/portainer.png"/></p>
+				</section>
+				<section data-background-image="imagenes/end.jpg" data-transition=>
+                    <!-- The End -->
+				</section>
+			</div>
+		</div>
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+				slideNumber: true,
+
+				multiplex: {
+				// Example values. To generate your own, see the socket.io server instructions.
+				// {"secret":"14844704510739173675","socketId":"fae7888528aa6ec7"}
+				secret: '14844704510739173675', // Obtained from the socket.io server. Gives this (the master) control of the presentation
+				id: 'fae7888528aa6ec7', // Obtained from socket.io server
+				url: 'https://reveal-js-multiplex-ccjbegmaii.now.sh' // Location of socket.io server
+    },
+
+
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Parallax scrolling
+				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				// parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '//cdn.socket.io/socket.io-1.3.5.js', async: true },
+					{ src: 'plugin/multiplex/master.js', async: true },
+					{ src: 'plugin/notes-server/client.js', async: true }
+				]
+			});
+
+		</script>
+		<style type="text/css">
+    /* 1. Style header/footer <div> so they are positioned as desired. */
+    #cabecera {
+        position: absolute;
+        top: 0%;
+        left: 0%;
+		width: 100%;
+		display: table;
+    }
+
+    #pie {
+        position: absolute;
+        bottom: 5%;
+        left: 0%;
+		width: 100%;
+		display: table;
+    }
+	#pie-text {
+		font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+		font-size: 18px;
+		font-weight: bold;
+		text-align: center;
+		display: table-cell;
+    }
+	#logo {
+		display: table-cell;
+		vertical-align: middle;
+		text-align: right;
+		}
+	#barra {
+		background-color: rgb(18,64,128);
+		font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+		font-size: 40px;
+		font-weight: bold;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		color: white;
+		border-top-left-radius:20px;
+		border-bottom-left-radius:20px;
+		border-top-right-radius:20px;
+		border-bottom-right-radius:20px;
+		display: table-cell;
+		vertical-align: middle;
+		text-align: center;
+	}
+</style>
+
+<!-- 2. Create hidden header/footer <div> -->
+<div id="hidden" style="display:none;">
+    <div id="header">
+        <div id="cabecera">
+			 <div id="logo"><img src="css/images/logo_small.png"></div><div id="barra">Taller de Docker</div>
+		</div>
+        <div id="pie"><div id="pie-text">© 2016-2017 Depto. Ciencia de la Computación e IA</div></div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script type="text/javascript">
+    // 3. On Reveal.js ready event, copy header/footer <div> into each `.slide-background` <div>
+    var header = $('#header').html();
+    if ( window.location.search.match( /print-pdf/gi ) ) {
+        Reveal.addEventListener( 'ready', function( event ) {
+            $('.slide-background').prepend(header);
+        });
+    }
+    else {
+        $('.slides').prepend(header);
+   }
+</script>
+
+	</body>
+</html>
