@@ -50,13 +50,13 @@
 					<h2>¿Qué aprenderemos en este curso?</h2>
 					<br>
 					<ul align=left>
-						<li class="fragment">Qué son los contenedores y qué beneficios aportan.</li>
-						<li class="fragment">Arquitectura y ecosistema de Docker.</li>
-						<li class="fragment">Comandos básicos de despliegue.</li>
-						<li class="fragment">Trabajar con volúmenes.</li>
-						<li class="fragment">Crear nuestros propios contenedores.</li>
-						<li class="fragment">Composición de contenedores.</li>
-						<li class="fragment">Escalado de servicios.</li>
+						<li>Qué son los contenedores y qué beneficios aportan.</li>
+						<li>Arquitectura y ecosistema de Docker.</li>
+						<li>Comandos básicos de despliegue.</li>
+						<li>Trabajar con volúmenes.</li>
+						<li>Crear nuestros propios contenedores.</li>
+						<li>Composición de contenedores.</li>
+						<li>Escalado de servicios.</li>
 					</ul>
 				</section>
 
@@ -126,6 +126,7 @@
 						<li>Platform as a Service: Cloud Foundry, OpenShift, Heroku... </li>
 						<li>IaaS: Amazon, Azure, Open Stack...</li>
 					</ul>
+						<p  align=center><img style="border: 0;" height="170" src="imagenes/cloud.png"></p>
                 </section>
 				<section data-transition="slide">
                     <h2>Agile</h2>
@@ -197,6 +198,7 @@
 						<img style="border: 0;"  height="350" src="imagenes/WhatIsDocker_2_VMs_0-2_2.png"/>
 						<img style="border: 0;"  height="350" src="imagenes/WhatIsDocker_3_Containers_2_0.png"/>
                     </p>
+					<p>Un contenedor Docker es un proceso del sistema operativo ejecutándose aislado del resto.</p>
 				</section>
 				<section data-transition="slide">
 					<p>
@@ -266,11 +268,11 @@
 					<p align=left>Integra bajo un un único API las distintas herramientas que permiten trabajar con contenedores y conseguir un aprovechamiento optimo de la infraestructura.</p>
 					<br>
 					<ul align=left>
-						<li class="fragment">Marzo 2013: Open Source.</li>
-						<li class="fragment">Marzo 2014: Abandono de LXC como tecnología de contenedores en pro de una propia.</li			>
-						<li class="fragment">Febrero 2015: Orquestación de contenedores mediante nuevas herramientas: <i>compose, machine y swarm</i>.</li>
-						<li class="fragment">Abril 2016: Docker 1.11. Cambio de arquitectura. Runtime <i>containerd/runC</i>.</li>
-						<li class="fragment">Diciembre 2016: Docker Inc. dona </i>containerd</i> a la OCI.</li>
+						<li>Marzo 2013: Open Source.</li>
+						<li>Marzo 2014: Abandono de LXC como tecnología de contenedores en pro de una propia.</li			>
+						<li>Febrero 2015: Orquestación de contenedores mediante nuevas herramientas: <i>compose, machine y swarm</i>.</li>
+						<li>Abril 2016: Docker 1.11. Cambio de arquitectura. Runtime <i>containerd/runC</i>.</li>
+						<li>Diciembre 2016: Docker Inc. dona </i>containerd</i> a la OCI.</li>
 					</ul>
                 </section>
 
@@ -474,8 +476,6 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 # Si el contenedor ya estuviera creado
 
 $ docker start -i HolaMundo
-#(-i/-d)
-
 </code></pre>
 </section>
 
@@ -529,7 +529,7 @@ $ docker ps
 <br>
 <h2>Consultar metadatos de un contenedor</h2>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-### --format "{{json .Plugins}}"
+### --format "{{json .NetworkSettings}}"
 $ docker inspect tomcat
 </code></pre>
 <br>
@@ -580,7 +580,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 <br>
 <p>Utilizar las propias interfaces de red del host</p>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-$ docker run -it --net=host --name tomcat:9-alpine
+$ docker run -it --net=host --name tomcat tomcat:9-alpine
 </code></pre>
 </section>
 
@@ -712,7 +712,7 @@ $ docker inspect miBD  --format "{{json .Mounts}}"
 "Destination":"/var/lib/mysql","Driver":"local","Mode":"","RW":true,"Propagation":""}]
 </code></pre>
 <br>
-<p align=left>Docker tiene comandos de backup, restore y migración de datos de estos volúmenes.</p>
+<p align=left>El backup/restore de datos sobre el sistema de archivos se implementa manualmente.</p>
 </section>
 <section data-transition="slide">
 <br>
