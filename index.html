@@ -735,7 +735,7 @@ ib_buffer_pool      performance_schema
 # Podeis comprobar que cualquier cambio realizado se ve fuera y dentro del contenedor ;-)
 # Otra prueba, creamos un esquema y una tabla dentro del propio contenedor
 
-$ docker  exec -i miBD sh
+$ docker  exec -it miBD sh
 $ mysql -uroot -p -e'create database misdatos; use misdatos; create table mitabla(id integer)'
 
 # Si paramos, eliminamos, y volvemos a crear el contenedor miBD podemos comprobar si la BD persiste:
@@ -881,6 +881,11 @@ $ docker inspect miBD  --format "{{json .Mounts}}"
 				<section data-transition="slide">
 					<h2>Docker registry</h2>
 					<img style="border: 0;" height="400" src="imagenes/registry.png"/>
+					<p align=left></p>
+				</section>
+				<section data-transition="slide">
+					<h2>Docker registry (II)</h2>
+					<img style="border: 0;" height="400" src="imagenes/registry2.png"/>
 					<p align=left>Otras alternativas: Artifactory, Nexus...</p>
 				</section>
 				<!-- Introducir ejercicios -- Hacer una demo con Docker hub-->
@@ -923,8 +928,12 @@ CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 # Preparar el entorno
 $ sudo apk update
+$ sudo apk add openjdk7
 $ sudo apk add maven
-$ sudo apk add openjdk8
+$ export PATH=$PATH:/usr/lib/jvm/java-1.7-openjdk/bin
+$ export JAVA_HOME=/usr/lib/jvm/java-1.7-openjdk
+
+
 
 # Descargar el proyecto de Git Hub
 $ git clone https://github.com/Djbyte1977/cursos.git
@@ -948,7 +957,7 @@ $ docker build -t usuario/cursos .
 </code></pre>
 				</section>
 				<section data-transition="slide">
-					<h2>Construir una imagen (Generic)</h2>
+					<h2>Construir una imagen (Linux Glibc)</h2>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 # Descargar el proyecto de Git Hub
 $ git clone https://github.com/Djbyte1977/cursos.git
@@ -1042,7 +1051,7 @@ $ docker push usuario/cursos
 # Una imagen de 108Mb con Linux y el JRE 8
 $ docker run -it --name alpine openjdk:8-jre-alpine sh
 
-# Vamos a ejecutar unos comandos en modo interactivo. Ojo que somos ROOT en el contenedor
+# Vamos a ejecutar unos comandos en modo interactivo. Recordad que somos ROOT en el contenedor
 $ mkdir /opt
 $ cd /opt
 $ wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip
@@ -1103,20 +1112,20 @@ CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"
 REPOSITORY                TAG                 IMAGE ID            CREATED             SIZE
 usuario/alpinecursos      v1.0                1f786bbb8c24        4 seconds ago       271 MB
 
-#Probad a ejecutar un docker history usuario/alpinecursos para tener más detalle
+#Probad a ejecutar un docker history usuario/alpinecursos:v1.0 para tener más detalle
 </code></pre>
 				</section>
 				<section data-transition="slide">
 					<h2>Prueba y publicación del servicio</h2>
 					</br>
 					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-# Una imagen de 108Mb con Linux y el JRE 8
-$ docker run -d --rm --name cursos -p8080:8080 -p9990:9990 usuario/alpinecursos
+# Probamos la imagen que acabamos de construir
+$ docker run -d --rm --name cursos -p8080:8080 -p9990:9990 usuario/alpinecursos:v1.0
 
 $ curl http://localhost:8080/cursos/resources/cursos
 {"cursos":"JavaEE, JavaScript, MongoDB"}
 
-$ docker push usuario/alpinecursos
+$ docker push usuario/alpinecursos:v1.0
 </code></pre>
 <br>
 <p align=left>Si se actualiza el WAR solo cambia la última capa (4Kb)</p>
@@ -1126,7 +1135,6 @@ $ docker push usuario/alpinecursos
 				</section>
 				<section data-transition="slide">
 					<p>Flexibilizar los deployments</p>
-					</br>
 					<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 FROM openjdk:8-jre-alpine
 LABEL autor = "Jose Luis Zamora Sanchez"
@@ -1150,8 +1158,7 @@ drwxr-xr-x    2 root     root          4096 Feb 11 23:50 .
 drwxr-xr-x    3 root     root          4096 Feb 11 23:50 ..
 -rw-r--r--    1 root     root          8870 Feb 10 23:03 README.txt
 </code></pre>
-<br>
-<p align=left>Se puede montar el volumen en una ruta específica (-v)</p>
+<p align=left>El volumen se crea automáticamente pero se puede redefinir con el parámetro -v.</p>
 				</section>
 				<section data-transition="slide">
 					<p>Ejecutar el servicio como usuario no privilegiado</p>
