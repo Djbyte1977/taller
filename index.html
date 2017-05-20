@@ -1372,7 +1372,7 @@ docker run --network=(NETWORK)
 					<p align=left>Apropiada para un contenedor sin funcionalidad de red (únicamente dirección de loopback)</p>
 					<br>
 					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-$ docker attach nonenetcontainer
+$  docker run --rm -it --network=none usuario/cursos:v1.0 sh
 
 root@0cb243cd1293:/# cat /etc/hosts
 127.0.0.1	localhost
@@ -1399,8 +1399,8 @@ root@0cb243cd1293:/#
 					<p align=left>Host: Esta red compartiría el stack de red del propio host. No es necesario mapear puertos.</p>
 					<br>
 					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-$ docker run --rm -d --network=host usuario/cursos:v1.0
-$ ifconfig | grep addr
+$ docker run --rm -d --name=cursos --network=host usuario/cursos:v1.0
+$  docker exec -it cursos ifconfig | grep addr
 docker0   Link encap:Ethernet  HWaddr 02:42:13:63:24:80
           inet addr:172.17.0.1  Bcast:0.0.0.0  Mask:255.255.0.0
 eth0      Link encap:Ethernet  HWaddr 08:00:27:53:96:28
