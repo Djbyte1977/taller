@@ -1206,7 +1206,7 @@ CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"
 <p align=left>Para cambiar el valor por defecto:</p>
 <br>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-$ docker  build --build-arg WF_IMG_VER=9.0.1.Final -t djbyte1977/alpinecursos .
+$ docker  build --build-arg WF_IMG_VER=9.0.1.Final -t prueba9 .
 </code></pre>
 				</section>
 <section data-transition="slide">
@@ -1287,6 +1287,38 @@ temp?		#Ignora cualquier fichero o directorio cuyo nombre empiece por temp y ten
 			#Ejemplo: carpeta/temporal
 </code></pre>
 				</section>
+				<section data-transition="slide">
+					<p>Multi Stage Builds (Docker CE 17-05)</p>
+					<br>
+				<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# --> BUILD
+FROM openjdk:8-jdk-alpine
+WORKDIR /opt
+RUN apk update
+RUN apk add maven
+RUN apk add git
+WORKDIR /opt
+RUN git clone https://github.com/Djbyte1977/cursos.git
+WORKDIR /opt/cursos
+RUN mvn package
+
+# --> RUN
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+EXPOSE 8080 9990
+WORKDIR /opt
+RUN wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip && \
+    unzip wildfly-10.1.0.Final.zip && \
+    rm wildfly-10.1.0.Final.zip && \
+    ln -s wildfly-10.1.0.Final wildfly
+RUN ./wildfly/bin/add-user.sh experto experto --silent
+
+COPY --from=0 /opt/cursos/target/cursos.war ./wildfly/standalone/deployments
+
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+				</section>				
+				
 				<section data-transition="slide">
 					<h2>Construcciones automáticas</h2>
 					<img style="border: 0;" height="400" src="imagenes/CI1.png"/>
