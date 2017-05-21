@@ -1355,14 +1355,14 @@ CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"
 					</ul>
 					<br>
 					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-docker network ls
+$ docker network ls
 
 NETWORK ID		NAME		DRIVER		SCOPE
 27daf57e88c3		bridge		bridge		local
 09f184e43350		host			host			local
 fde6b8b6a6d4		none			null			local
 
-docker run --network=(NETWORK)
+$ docker run --network=(NETWORK)
 
 </code></pre>
 <p align=left>Cada red tiene su driver asociado. Hay otros drivers, (overlay, macvlan) utilizados en Docker Swarm.</p>
@@ -1521,7 +1521,7 @@ $ docker network inspect bridge
 
 #Ejecutamos un contenedor "cliente" (misma imagen) con el parámetro --link:
 
-docker run -it --rm --link miBD --name cliente mysql:latest sh
+$ docker run -it --rm --link miBD --name cliente mysql:latest sh
 
 $ cat /etc/hosts
 127.0.0.1       localhost
@@ -1900,23 +1900,23 @@ services:
        MYSQL_USER: wordpress
        MYSQL_PASSWORD: wordpress
      networks:
-      - back-tier
+       - back-tier
 
  
 </code></pre>
 </section>
 <section>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
- lb:
-    image: dockercloud/haproxy
-    ports:
-      - 8080:80
-    links:
-      - web
-    networks:
-      - front-tier
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock 
+  lb:
+     image: dockercloud/haproxy
+     ports:
+       - 8080:80
+     links:
+       - web
+     networks:
+       - front-tier
+     volumes:
+       - /var/run/docker.sock:/var/run/docker.sock 
 
 networks:
   front-tier:
@@ -1936,7 +1936,7 @@ cursos_lb_1		/sbin/tini -- dockercloud- ...			Up		1936/tcp, 443/tcp, 0.0.0.0:808
 cursos_web_1		docker-entrypoint.sh apach ...		Up		0.0.0.0:32768->80/tcp
 
 # Probar a acceder a la aplicación:
-# http://127.0.0.1:8080 o http://192.168.99.100:8080
+# http://127.0.0.1:8080 o http://192.168.99.100:8080 (en función del tipo de conexión VBox)
 
 </code></pre>
 </section>
@@ -1992,12 +1992,14 @@ services:
 <p align=left>database.yml</p>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 version: '2'
-db:
-   environment:
-       MYSQL_ROOT_PASSWORD: wordpress
-       MYSQL_DATABASE: wordpress
-       MYSQL_USER: wordpress
-       MYSQL_PASSWORD: wordpress
+services:
+  db:
+     environment:
+        MYSQL_ROOT_PASSWORD: wordpress
+        MYSQL_DATABASE: wordpress
+        MYSQL_USER: wordpress
+        MYSQL_PASSWORD: wordpress
+
 </code></pre>
 </section>
 <section data-transition="slide">
