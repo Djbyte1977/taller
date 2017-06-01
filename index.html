@@ -1617,7 +1617,7 @@ $ docker network inspect simple
             }
 
 # Creamos un nuevo contenedor directamente en la nueva red
-$ docker run --rm --network=simple -it --link miBD --name cliente mysql:latest sh -c 'exec mysql -h"miBD" -P"3306" -uroot -p"clave"'
+$ docker run --rm --network=simple -it --name cliente mysql:latest sh -c 'exec mysql -h"miBD" -P"3306" -uroot -p"clave"'
 
 </code></pre>
 </section>
