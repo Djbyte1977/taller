@@ -1570,9 +1570,11 @@ docker run -it --rm --link miBD --name cliente mysql:latest sh -c 'exec mysql -h
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 $ docker network create simple
 
+# Se crea una nueva interfaz. Lo podemos ver con ifconfig
+$ ifconfig
+
 $ docker network inspect simple
-[
-    {
+[{
         "Name": "simple",
         "Id": "c8b5d18bbd7a46bc52683593fbc68dd3802b1129cc141d41ca935fc26cd983fd",
         "Scope": "local",
@@ -1592,8 +1594,7 @@ $ docker network inspect simple
         "Containers": {},
         "Options": {},
         "Labels": {}
-    }
-]
+}]
 </code></pre>
 </section>
 <section data-transition="slide">
