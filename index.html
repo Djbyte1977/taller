@@ -62,18 +62,18 @@
 
 				<section data-transition="slide">
 					<h2>¿Qué necesitamos?</h2>
-					<br>
-					<p align=left>Do it yourself!</p>
-					<ul align=left>
-						<li>Máquina virtual linux con Docker 17.10-ce. <a href="mv/Curso2018.zip" target="_blank">Aquí.</a></li>
-						<li>Exponer puertos 22(222 host),8080</li>
-						<li>Cliente SSH, como Putty. <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank">Aquí.</a></li>
-					</ul>
-					<p align=left><br>Lazy mode :P</p>
+					<br>					
+					<p align=left>Aprende sin complicaciones</p>
 					<ul align=left>
 						<li>Play with Docker <a href="http://play-with-docker.com/" target="_blank">http://play-with-docker.com/</a></li>
 						<li>Opcional: Private Key para Putty. <a href="mv/privada.ppk" target="_blank">Aquí.</a></li>
 					</ul>
+					<p align=left><br>Uso más cercano a la realidad</p>
+					<ul align=left>
+						<li>Máquina virtual linux con Docker 17.10-ce. <a href="mv/Curso2018.zip.001" target="_blank">(Parte 1) </a><a href="mv/Curso2018.zip.002" target="_blank">(Parte 2)</a></li>
+						<li>Exponer puertos 22(222 host),8080</li>
+						<li>Cliente SSH, como Putty. <a href="http://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html" target="_blank">Aquí.</a></li>
+					</ul>					
 					<p align=left><br>Guarda tus proyectos!</p>
 					<ul align=left>
 						<li>Cuenta en GitHub / Bitbucket.</li>
@@ -261,18 +261,17 @@
 				</section>
 
 				<section data-transition="slide">
-                    <p align=left>Algo de historia:</p>
-					<br>
-
-					<p align=left>Nace como un proyecto interno de la emplesa <i>dotCloud</i> dedicada a PaaS.</p>
-					<p align=left>Integra bajo un un único API las distintas herramientas que permiten trabajar con contenedores y conseguir un aprovechamiento optimo de la infraestructura.</p>
+                    <p align=left>Algo de historia:</p><br>
+					<p align=left>Proyecto interno de la emplesa <i>dotCloud</i> dedicada a PaaS.</p>
+					<p align=left>Integra bajo un único API distintas herramientas que permiten aislar procesos y conseguir un aprovechamiento óptimo de la infraestructura.</p>
 					<br>
 					<ul align=left>
 						<li>Marzo 2013: Open Source.</li>
 						<li>Marzo 2014: Abandono de LXC como tecnología de contenedores en pro de una propia.</li			>
-						<li>Febrero 2015: Orquestación de contenedores mediante nuevas herramientas: <i>compose, machine y swarm</i>.</li>
+						<li>Febrero 2015: Docker <i>compose, machine y swarm</i>.</li>
 						<li>Abril 2016: Docker 1.11. Cambio de arquitectura. Runtime <i>containerd/runC</i>.</li>
-						<li>Diciembre 2016: Docker Inc. dona </i>containerd</i> a la OCI.</li>
+						<li>Diciembre 2016: Estandarización: Docker Inc. dona </i>containerd</i> a la OCI.</li>
+						<li>2017: Docker Enterprise, Docker Store, LCOW, K8s</li>
 					</ul>
                 </section>
 
@@ -439,6 +438,7 @@ docker run			# -----> Crea y ejecuta un nuevo contenedor
 docker pull			# -----> Descarga una imagen de Docker Hub o un repositorio
 
 				</code></pre>
+				<p  align=center><img style="border: 0;" height="250" src="imagenes/suricata.jpg"></p>
 				</section>
 
 
@@ -547,7 +547,7 @@ $ docker inspect tomcat
 # Devolvería el log que ha generado el contenedor
 $ docker logs -f tomcat
 
-# Conectarse en modo intectivo a un proceso en background
+# Conectarse en modo intectivo a un proceso en background. Desconexión CTRL+P, CTRL+Q
 $ docker attach tomcat
 </code></pre>
 <br>
@@ -728,7 +728,7 @@ $ docker inspect miBD  --format "{{json .Mounts}}"
 <h2>Uso de volúmenes</h2>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 # Montar un directorio específico del host
-$ docker run --name miBD -p3306:3306 -v /home/experto/datos:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=clave \
+$ docker run --name miBD -p3306:3306 -v $HOME/datos:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=clave \
    -d mysql:latest
 
 390ef8ca3ded170598e4ec2f29333f663dc6482d0f01a0605e2c08e24523453f
