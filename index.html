@@ -603,8 +603,6 @@ $ docker run -it --name tomcat -p8080:8080 --env JAVA_OPTS=-Djava.security.egd=f
 <br>
 <p align=left>¿Lentitud en el arranque de Tomcat?
 </section>
-
-
 <section data-transition="slide">
 <br>
 <h2>Cambiar el namespace de un contenedor. (debugging)</h2>
@@ -625,6 +623,18 @@ $ docker exec -it tomcat sh
 $ docker run --restart=on-failure:10 tomcat
 </code></pre>
 
+</section>
+
+<section data-transition="slide">
+<br>
+<h2>Java & Docker</h2>
+<p align=center><img style="border: 0;" height="150" src="imagenes/duke_docker.png"/></p>
+<ul align=left>
+	<li>Java no sabe qué es un contenedor (hasta Java SE 8u131/JDK 9)
+	<li>Por defecto Docker no restringe la CPU/Memoria y Java tampoco --> OOM en Producción</li>
+	<li>Límites de CPU autogestionados con JRE modernos.</li>
+	<li>Heap memoria autogestionado: <br>-XX:+UnlockExperimentalVMOptions <br>-XX:+UseCGroupMemoryLimitForHeap </li>
+</ul>
 </section>
 
 <section data-transition="slide">
