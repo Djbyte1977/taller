@@ -907,8 +907,13 @@ $ docker inspect miBD  --format "{{json .Mounts}}"
 					<img style="border: 0;" height="400" src="imagenes/registry2.png"/>
 					<p align=left>Otras alternativas: Artifactory, Nexus...</p>
 				</section>
-				<!-- Introducir ejercicios -- Hacer una demo con Docker hub-->
-
+				<section data-transition="slide">
+					<h2>Docker store</h2>
+					<p align=left>https://store.docker.com</p>
+					<img style="border: 0;" height="400" src="imagenes/store.png"/>
+				</section>
+			<!-- Introducir ejercicios -- Hacer una demo con Docker hub-->
+	
 				<section class="intro" data-background="#ffebcc" data-transition="zoom">
 					<h2>DOCKERFILE</h2>
 				</section>
@@ -949,10 +954,10 @@ CMD ["/opt/jboss/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.
 $ sudo apk update
 $ sudo apk add openjdk7
 $ sudo apk add maven
+$ sudo apk add git
+
 $ export PATH=$PATH:/usr/lib/jvm/java-1.7-openjdk/bin
 $ export JAVA_HOME=/usr/lib/jvm/java-1.7-openjdk
-
-
 
 # Descargar el proyecto de Git Hub
 $ git clone https://github.com/Djbyte1977/cursos.git
@@ -1284,6 +1289,8 @@ CMD ["--help"]
 				<p align=left>Ejecución con parámetros por defecto y parámetros específicos:</p>
 <br>
 				<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker build -t djbyte1977/wc .
+
 $ docker run -it -v $(pwd):/opt/ --rm --name=wc djbyte1977/wc                   #Mostrará la ayuda por defecto
 
 $ docker run -it -v $(pwd):/opt/ --rm --name=wc djbyte1977/wc -c Dockerfile
@@ -1558,7 +1565,7 @@ ff02::2 ip6-allrouters
 <section data-transition="slide">
 <br>
 					<h2>Enlaces</h2>
-<p align=left>El "truco" está en que Docker sustituye estos ficheros por ficheros externos configurador por él:</p>
+<p align=left>El "truco" está en que Docker sustituye estos ficheros por ficheros externos configurados por él:</p>
 <br>
 					 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 
@@ -1648,6 +1655,15 @@ $ docker run --rm --network=simple -it --name cliente mysql:latest sh -c 'exec m
 
 $ docker run --rm --network=simple -it --name cliente mysql:latest sh
 
+$ cat /etc/hosts
+127.0.0.1       localhost
+::1     localhost ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+172.19.0.3      51538b41602f
+
 $ ping miBD
 PING miBD (172.18.0.2): 56 data bytes
 64 bytes from 172.18.0.2: icmp_seq=0 ttl=64 time=0.046 ms
@@ -1676,7 +1692,7 @@ PING miBD (172.18.0.2): 56 data bytes
 					<p align=center><img style="border: 0;" height="200" src="imagenes/compose.png"/></p>
 					<p align=left>docker-compose.yml</p>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-version: '2'
+version: '3'
 services:
   web:
     build: .
@@ -1772,7 +1788,7 @@ $ docker-compose rm
 <section data-transition="slide">
 <p align=left>Multi-contenedor</p>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-version: '2'
+version: '3'
 services:
   db:
      image: mysql:5.7
@@ -1823,7 +1839,7 @@ PING db (172.20.0.2): 56 data bytes
 </section>
 <section>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-version: '2'
+version: '3'
 services:
    db:
      image: mysql:5.7
@@ -1891,7 +1907,7 @@ $ docker-compose kill wordpress
                 </section>
 <section>
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-version: '2'
+version: '3'
 services:
   web:
      depends_on:
@@ -1974,14 +1990,14 @@ $ docker-compose logs -f --tail=0  web
 
 # Escalar servicios:
 
-$ docker-compose scale web=3
+$ docker-compose up --scale web=3
 Creating and starting cluster_web_2 ... done
 Creating and starting cluster_web_3 ... done
 
 # Si ejecutamos docker ps veremos como Compose asigna puertos automáticamente a las instancias web
 # Lanzar varias peticiones a través del navegador
 
-$ docker-compose scale web=1
+$ docker-compose up --scale web=1
 Stopping and removing cluster_web_2 ... done
 Stopping and removing cluster_web_3 ... done
 
@@ -1992,8 +2008,7 @@ Stopping and removing cluster_web_3 ... done
 
 <section data-transition="slide">
 <h2>Extends: "Herencia" entre contenedores</h2>
-<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-version: '2'
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">version: '2'# en V3+ desaparece, concatenar ficheros con -f
 services:
   db:
      extends:
@@ -2010,8 +2025,7 @@ services:
      - db
 </code></pre>
 <p align=left>database.yml</p>
-<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
-version: '2'
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">version: '2'
 services:
   db:
      environment:
@@ -2019,7 +2033,6 @@ services:
         MYSQL_DATABASE: wordpress
         MYSQL_USER: wordpress
         MYSQL_PASSWORD: wordpress
-
 </code></pre>
 </section>
 <section data-transition="slide">
