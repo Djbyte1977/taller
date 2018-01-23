@@ -668,11 +668,22 @@ Deleted: sha256:f4b953670d9d801b819daa53a95ed73e105ed0bd5a197b64c04b3db624184e80
 docker rmi $(docker images -q)
 </code></pre>
 </section>
-
 				<section data-transition="fade-in">
 					<br>
 					<h2>Resumiendo</h2>
 					<img style="border: 0;" height="500" src="imagenes/event_state.png"/>
+				</section>
+				<section data-transition="slide">
+					<h2>Work Out</h2>
+					<p align=left>djbyte1977/libreria</p><br>
+					<ol align=left>
+						<li>Desplegar la aplicación y comprobar que funciona http://localhost:8080/libreria</li>
+						<li>Dar de alta un libro y consultar su api REST http://localhost:8080/libreria/rest/libros</li>
+						<li>Probar el resto de comandos que hemos aprendido.</li>
+					</ol>
+					<br>
+					<img style="border: 0;" height="200" src="imagenes/goku_workout.jpg"/>
+					
 				</section>
 				<section class="intro" data-background="#ffebcc" data-transition="zoom">
 					<h2>VOLÚMENES</h2>
@@ -1363,6 +1374,18 @@ CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"
 					<br>
 					<p align><a href="https://docs.docker.com/engine/reference/builder/" target="_blank">Dockerfile reference</a></p>
 					<p align=center><img style="border: 0;" height="400" src="imagenes/china.jpg"/></p>
+				</section>
+				<section data-transition="slide">
+					<h2>Work Out</h2>
+					<p align=left>djbyte1977/libreria</p><br>
+					<ol align=left>
+						<li>Crear un dockerfile para desplegar el proyecto a partir del código fuente https://github.com/Djbyte1977/libreria.git</li>
+						<li>Configurar un dockerfile multistage</li>
+						<li>Crear una build automática en Docker Hub.</li>
+					</ol>
+					<br>
+					<img style="border: 0;" height="200" src="imagenes/goku_workout.jpg"/>
+					
 				</section>
 				<section class="intro" data-background="#ffebcc" data-transition="zoom">
 					<h2>NETWORKING</h2>
