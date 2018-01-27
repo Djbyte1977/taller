@@ -1376,16 +1376,48 @@ CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"
 					<p align=center><img style="border: 0;" height="400" src="imagenes/china.jpg"/></p>
 				</section>
 				<section data-transition="slide">
-					<h2>Work Out</h2>
-					<p align=left>djbyte1977/libreria</p><br>
-					<ol align=left>
-						<li>Crear un dockerfile para desplegar el proyecto a partir del código fuente https://github.com/Djbyte1977/libreria.git</li>
-						<li>Configurar un dockerfile multistage</li>
-						<li>Crear una build automática en Docker Hub.</li>
-					</ol>
-					<br>
-					<img style="border: 0;" height="200" src="imagenes/goku_workout.jpg"/>
-					
+					<section data-transition="slide">
+						<h2>Work Out</h2>
+						<p align=left>djbyte1977/libreria</p><br>
+						<ol align=left>
+							<li>Crear un dockerfile para desplegar el proyecto a partir del código fuente https://github.com/Djbyte1977/libreria.git</li>
+							<li>Configurar un dockerfile multistage</li>
+							<li>Crear una build automática en Docker Hub.</li>
+						</ol>
+						<br>
+						<img style="border: 0;" height="200" src="imagenes/goku_workout.jpg"/>
+						
+					</section>
+					<section data-transition="slide">
+						<h2>Work Out</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# --> BUILD
+FROM openjdk:8-jdk-alpine
+WORKDIR /opt
+RUN apk update
+RUN apk add maven
+RUN apk add git
+WORKDIR /opt
+RUN git clone https://github.com/Djbyte1977/libreria.git
+WORKDIR /opt/libreria
+RUN mvn package
+
+# --> RUN
+FROM openjdk:8-jre-alpine
+LABEL autor = "Jose Luis Zamora Sanchez"
+EXPOSE 8080 9990
+WORKDIR /opt
+RUN wget http://download.jboss.org/wildfly/10.1.0.Final/wildfly-10.1.0.Final.zip && \
+    unzip wildfly-10.1.0.Final.zip && \
+    rm wildfly-10.1.0.Final.zip && \
+    ln -s wildfly-10.1.0.Final wildfly
+RUN ./wildfly/bin/add-user.sh experto experto --silent
+
+COPY --from=0 /opt/libreria/target/libreria.war ./wildfly/standalone/deployments
+
+CMD ["/opt/wildfly/bin/standalone.sh", "-b", "0.0.0.0", "-bmanagement","0.0.0.0"]
+</code></pre>
+					</section>
 				</section>
 				<section class="intro" data-background="#ffebcc" data-transition="zoom">
 					<h2>NETWORKING</h2>
@@ -1696,6 +1728,21 @@ PING miBD (172.18.0.2): 56 data bytes
 </code></pre>
 <br>
 <p align=left>Docker implementa un servicio de DNS dentro de las redes de usuario utilizando propiedades como el nombre de un contenedor. El parámetro --link no es necesario.</p>
+</section>
+<section data-transition="slide">
+<br>
+<h2>Mapeo de puertos (revisited)</h2>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+# Mapeo específico:
+$ docker run -it --name tomcat -p8080:8080 tomcat:9-alpine
+</code></pre>
+<br>
+<ul align="left">
+	<li>El mapeo de puertos NO cambia los puertos que expone un contenedor.</li>
+	<li>El mapeo de puertos funciona como un tunel SSH, asocia el puerto una interfaz del Host (o todas) al puerto del contenedor.</li>
+	<li>Desde un Docker Host se puede acceder a un contenedor sin utilizar mapeo de puertos, a través de la IP de la subred.</li>
+	<li>Los contenedores NO saben de puertos mapeados en el Docker Host, tan solo ven los contenedores que están en su subred.</li>
+</ol>
 </section>
 
 				<section data-transition="slide">
@@ -2071,7 +2118,47 @@ services:
 					<p align=left><br><a href="https://docs.docker.com/compose/compose-file" target="_blank">Manual de referencia de Docker Compose</a>.
 					
 				</section>
-				
+				<section data-transition="slide">
+					<section data-transition="slide">
+						<h2>Work Out</h2>
+						<p align=left>API REST + Cliente</p><br>
+						<ol align=left>
+							<li>Crear un contenedor servidor web NGinx que sirva contenido estático (HTML)<br>
+							https://github.com/Djbyte1977/RestClient.git</li>
+							<li>Desplegarlo conjuntamente con el contedor djbyte1977/libreria mediante docker-compose.</li>
+							<li>Comprobar que el cliente conecta con el API REST.</li>
+						</ol>
+						<img style="border: 0;" height="200" src="imagenes/goku_workout.jpg"/>
+						
+					</section>
+					<section data-transition="slide">
+						<h2>Work Out</h2>
+						<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+FROM nginx:stable-alpine
+COPY ./html /usr/share/nginx/html
+---------------------------------------------
+version: '3'
+services:
+   api:
+     image: djbyte1977/libreria
+     networks:
+       - privada
+     ports:
+       - 8080:8080
+   nginx:
+     depends_on:
+       - api
+     image: djbyte1977/nginx
+     ports:
+       - 8000:80
+     networks:
+       - privada
+networks:
+  privada:
+
+						</code></pre>
+					</section>
+				</section>
 				<!-- Play with docker -->
 				<section class="intro" data-background="#ffebcc" data-transition="zoom">
 					<h2>ECOSISTEMA DOCKER</h2>
