@@ -2251,7 +2251,7 @@ bbca4cd02690fd3c7c10b68373a24048f246b46f6c501276a63e096c525a044d
 						<li>Interoperabilidad entre cliente y servidor Docker con API's de distintas versiones.</li>
 						<li>Extensibilidad vía plugins.</li>
 						<li><i>--squash</i> Unificar en una sola capa todas las diferencias con respecto a la imagen base al ejecutar docker build.
-						<li>Despliegue de servicios en "blundles" a clusters de Swarm.</li>
+						<li>Despliegue de servicios en "bundles" a clusters de Swarm.</li>
 						<li>Gestión de credenciales (secrets) en clusters de Swarm.</li>
 						
 					</ul>
@@ -2275,7 +2275,7 @@ bbca4cd02690fd3c7c10b68373a24048f246b46f6c501276a63e096c525a044d
 					<p align=center><img style="border: 0;" height="500" src="imagenes/dockermachine.png"/></p>
 				</section>
 				<section data-transition="slide">
-					<h2>docker-cloud</h2>
+					<h2>Docker Cloud</h2>
 					<br>
 					<ul>
 						<li>Interfaz web para CI/CD de aplicaciones sobre infraestructura diversa.</li>
@@ -2284,6 +2284,10 @@ bbca4cd02690fd3c7c10b68373a24048f246b46f6c501276a63e096c525a044d
 						<li>docker-cloud.yml</li>
 						<li>Bring your own node: Ubuntu, Debian, Centos, Red Hat Linux, Fedora.</li>
 					</ul>
+				</section>
+				<section data-transition="slide">
+					<h2>Docker Cloud</h2>
+					<p align=center><img style="border: 0;" height="500" src="imagenes/dockercloud.png"/></p>
 				</section>
 				<section data-transition="slide">
 					<h2>Docker Swarm</h2>
@@ -2296,19 +2300,107 @@ bbca4cd02690fd3c7c10b68373a24048f246b46f6c501276a63e096c525a044d
 					<p align=left>¿Y Swarm?</p>
 					<ul>
 						<li>Es la herramienta que incorporar Docker out-of-the-box para configurar clusters.</li>
-						<li>Es mucho más sencilla de utilizar que Kubernetes/Mesos, pero menos madura de cara a entornos de producción.</li>
+						<li>Es mucho más sencilla de utilizar que Kubernetes/Mesos, aunque más limitada.</li>
 					</ul>
 				</section>
 				<section data-transition="slide">
 					<h2>Docker Swarm</h2>
 					<p align=center><img style="border: 0;" height="400" src="imagenes/docker-swarm.jpg"/></p>
 					<p align=center><a href="http://play-with-docker.com" target="_blank">Play with Docker</a></p>
+				</section>
+				<section data-transition="slide">
+					<h2>Balanceo de carga</h2>
+					<p align=center><img style="border: 0;" height="400" src="imagenes/ingress.png"/></p>
 					
 				</section>
 				<section data-transition="slide">
-					<h2>Docker Cloud</h2>
-					<p align=center><img style="border: 0;" height="500" src="imagenes/dockercloud.png"/></p>
-				</section>
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+$ docker swarm init --advertise-addr 192.168.0.153
+
+#configuramos 3 manager y 2 worker
+$ docker swarm join-token manager #--> Muestra cómo conectar un manager adicional
+
+$ docker node ls
+ID                            HOSTNAME            STATUS              AVAILABILITY        MANAGER STATUS
+k0q0hwhmytn7nln5hel7ifput *   node1               Ready               Active              Leader
+3mruws2at9pjaqpjq98voxsk2     node2               Ready               Active              Reachable
+qs83fq2wcxamqv2cbjv3h3fcz     node3               Ready               Active              Reachable
+m2v39bvkd6ubp1majsgvu8gu8     node4               Ready               Active
+ni6sjdmcym4d12mgit6x5smk7     node5               Ready               Active
+
+#Desplegamos un servicio:
+$ docker service create --name helloworld --publish published=8080,target=80 --replicas 1 nginx:1.12
+
+#Listamos todos los servicios desplegados
+$ docker service ls
+
+#Visualizamos todas las tareas (instancias) de cada servicio desplegados
+$ docker service ps helloworld
+
+#Probar el load balancer de cada nodo:
+curl localhost:8080
+
+#Obtener información de un servicio
+docker service inspect --pretty helloworld
+
+
+</code></pre>
+</section>
+<section data-transition="slide">
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+#Escalar un servicio
+$ docker service scale helloworld=5
+
+$ docker service ps helloworld
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE            ERROR               PORTS
+fkouma90mbne        helloworld.1        alpine:latest       node1               Running             Running 11 minutes ago
+omijg0d3yycl        helloworld.2        alpine:latest       node4               Running             Running 32 seconds ago
+8zhzwj04fhcj        helloworld.3        alpine:latest       node5               Running             Running 32 seconds ago
+jzkk6r1053pw        helloworld.4        alpine:latest       node2               Running             Running 31 seconds ago
+d7ciaxcphhqn        helloworld.5        alpine:latest       node3               Running             Running 31 seconds ago
+
+#Actualizar en caliente (rolling update)
+$ docker service update --image nginx:1.13 helloworld
+
+$ docker service ps helloworld
+ID                  NAME                IMAGE               NODE                DESIRED STATE       CURRENT STATE             ERROR               PORTS
+d8xag5p89i96        helloworld.1        nginx:1.13          node5               Running             Running 16 seconds ago
+qbeewo5d59zy         \_ helloworld.1    nginx:1.12          node5               Shutdown            Shutdown 18 seconds ago
+4yft2dv24fea        helloworld.2        nginx:1.13          node4               Running             Running 21 seconds ago
+5161pho25v6t         \_ helloworld.2    nginx:1.12          node4               Shutdown            Shutdown 22 seconds ago
+6om35t7024xj        helloworld.3        nginx:1.13          node1               Running             Running 7 seconds ago
+vc1zsb6v7ig2         \_ helloworld.3    nginx:1.12          node1               Shutdown            Shutdown 8 seconds ago
+twcmk6dq7dqq        helloworld.4        nginx:1.13          node2               Running             Running 11 seconds ago
+uywh8zjgfngg         \_ helloworld.4    nginx:1.12          node2               Shutdown            Shutdown 12 seconds ago
+gv4v5wabetf1        helloworld.5        nginx:1.13          node3               Running             Running 2 seconds ago
+xt25x2vxd63c         \_ helloworld.5    nginx:1.12          node3               Shutdown            Shutdown 3 seconds ago
+</code></pre>
+</section>
+<section data-transition="slide">
+<pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
+#Probar rollback
+$ docker service update --rollback helloworld
+
+#Borrado de un servicio
+$ docker service rm helloworld
+
+#También es posible desplegar un stack de servicios descrito en docker-compose.yml 
+#Utilizar el de la slide 124 (ELIMINANDO EL MOUNT)
+
+$ docker stack deploy --compose-file docker-compose.yml stackdemo
+
+#Desplegar Portainer (!)
+
+$ docker service create \
+    --name portainer \
+    --publish 9000:9000 \
+    --constraint 'node.role == manager' \
+    --mount type=bind,src=//var/run/docker.sock,dst=/var/run/docker.sock \
+    portainer/portainer \
+    -H unix:///var/run/docker.sock
+</code></pre>
+
+</section>
 				<section>
 					<h2>Portainer</h2>
 						<p align=center><img style="border: 0;" height="500" src="imagenes/portainer.png"/></p>
