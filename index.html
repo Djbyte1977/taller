@@ -93,7 +93,7 @@
 					<h2>UN POCO DE CONTEXTO...</h2>
 				</section>
 				<section class="star-wars" data-background="imagenes/starwars.jpg">
-				<audio data-autoplay class="fragment" src="http://mwavs.com/0093677609/MP3S/Movies/Star_Wars/starwars.mp3"></audio>
+				<audio data-autoplay class="fragment" src="http://www.moviewavs.com/0053148414/MP3S/Movies/Star_Wars/starwars.mp3"></audio>
 				<div class="fade"></div>
 			  <div class="crawl">
 				<div class="title">
@@ -281,7 +281,7 @@
 				</section>
 
 				<section data-transition="fade-in">
-					<h2>¡Contenedores everywhere!</h2>
+					<h2>Hablar de contenedores es <i>mainstream</i></h2>
 					<br>
 					<p  align=center><img style="border: 0;" height="400" src="imagenes/TomokoANIM.gif"></p>
 				</section>
@@ -630,11 +630,10 @@ $ docker run --restart=on-failure:10 tomcat
 <br>
 <h2>Java & Docker</h2>
 <p align=center><img style="border: 0;" height="150" src="imagenes/duke_docker.png"/></p>
-<ul align=left>
-	<li>Java no sabe qué es un contenedor (hasta Java SE 8u131/JDK 9)
-	<li>Por defecto Docker no restringe la CPU/Memoria y Java tampoco --> OOM en Producción</li>
-	<li>Límites de CPU autogestionados con JRE modernos.</li>
-	<li>Heap memoria autogestionado: <br>-XX:+UnlockExperimentalVMOptions <br>-XX:+UseCGroupMemoryLimitForHeap </li>
+<ul align=left>	
+	<li>Antes de 8u131/JDK 9: Por defecto Docker no restringe la CPU/Memoria y Java sólo ve la máquina física --> OOM.</li>
+	<li>Java 9: <br>&nbsp-XX:+UnlockExperimentalVMOptions <br>&nbsp-XX:+UseCGroupMemoryLimitForHeap.</li>
+	<li>Java 10+: Por defecto JVM trabaja aplicando las cuotas definidas en cgroups.</li>
 </ul>
 </section>
 
@@ -2509,7 +2508,7 @@ $ docker service create \
         <div id="cabecera">
 			 <div id="logo"><img src="css/images/logo_small.png"></div><div id="barra">Taller de Docker</div>
 		</div>
-        <div id="pie"><div id="pie-text">© 2017-2018 Depto. Ciencia de la Computación e IA</div></div>
+        <div id="pie"><div id="pie-text">© 2018-2019 Depto. Ciencia de la Computación e IA</div></div>
     </div>
 </div>
 
