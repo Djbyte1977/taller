@@ -919,7 +919,7 @@ $ docker inspect miBD  --format "{{json .Mounts}}"
 					<p align=left>Otras alternativas: Artifactory, Nexus...</p>
 				</section>
 				<section data-transition="slide">
-					<h2>Docker store</h2>
+					<h2>Docker store (RIP)</h2>
 					<p align=left>https://store.docker.com</p>
 					<img style="border: 0;" height="400" src="imagenes/store.png"/>
 				</section>
@@ -1708,7 +1708,7 @@ $ docker run --rm --network=simple -it --name cliente mysql:latest sh -c 'exec m
 <pre><code  align=left class="bash"  data-trim  style="font-size: 18px;">
 # Lanzamos un sh dentro de la red simple:
 
-$ docker run --rm --network=simple -it --name cliente mysql:latest sh
+$ docker run --rm --network=simple -it --name cliente alpine:latest sh
 
 $ cat /etc/hosts
 127.0.0.1       localhost
@@ -2060,14 +2060,14 @@ $ docker-compose logs -f --tail=0  web
 
 # Escalar servicios:
 
-$ docker-compose up --scale web=3
+$ docker-compose up -d --scale web=3
 Creating and starting cluster_web_2 ... done
 Creating and starting cluster_web_3 ... done
 
 # Si ejecutamos docker ps veremos como Compose asigna puertos automáticamente a las instancias web
 # Lanzar varias peticiones a través del navegador
 
-$ docker-compose up --scale web=1
+$ docker-compose up -d --scale web=1
 Stopping and removing cluster_web_2 ... done
 Stopping and removing cluster_web_3 ... done
 
@@ -2274,7 +2274,7 @@ bbca4cd02690fd3c7c10b68373a24048f246b46f6c501276a63e096c525a044d
 					<p align=center><img style="border: 0;" height="500" src="imagenes/dockermachine.png"/></p>
 				</section>
 				<section data-transition="slide">
-					<h2>Docker Cloud</h2>
+					<h2>Docker Cloud --> Docker Hub (Dic 2018)</h2>
 					<br>
 					<ul>
 						<li>Interfaz web para CI/CD de aplicaciones sobre infraestructura diversa.</li>
